@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CITECA — Research Center for Advanced Technologies | ISTEC Porto</title>
+  <meta name="description" content="CITECA is the Research Centre for Advanced Technologies at ISTEC Porto, promoting research, innovation, international cooperation and knowledge transfer in information and communication technologies.">
+  <meta name="theme-color" content="#0B3C6D">
+  <meta property="og:title" content="CITECA — Research Center for Advanced Technologies">
+  <meta property="og:description" content="Research Centre for Advanced Technologies at ISTEC Porto.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="assets/logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="progress" aria-hidden="true"></div>
+  <header class="header" data-active="home"></header>
+
+  <main id="main">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-bg" aria-hidden="true">
+        <svg width="100%" height="100%" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <radialGradient id="glow1" cx="20%" cy="20%" r="60%"><stop offset="0%" stop-color="#1CA9C9" stop-opacity=".55"/><stop offset="100%" stop-color="#0B3C6D" stop-opacity="0"/></radialGradient>
+            <radialGradient id="glow2" cx="85%" cy="80%" r="60%"><stop offset="0%" stop-color="#4CC0DA" stop-opacity=".35"/><stop offset="100%" stop-color="#0B3C6D" stop-opacity="0"/></radialGradient>
+            <pattern id="grid" width="56" height="56" patternUnits="userSpaceOnUse"><path d="M56 0H0V56" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="1"/></pattern>
+          </defs>
+          <rect width="1440" height="900" fill="url(#grid)"/>
+          <rect width="1440" height="900" fill="url(#glow1)"/>
+          <rect width="1440" height="900" fill="url(#glow2)"/>
+        </svg>
+      </div>
+      <div class="hero-particles" aria-hidden="true"></div>
+      <div class="hero-inner">
+        <span class="hero-badge"><i data-icon="sparkles" data-size="14"></i><span data-i18n="hero.badge"></span></span>
+        <h1 data-i18n="hero.title"></h1>
+        <p class="hero-desc" data-i18n="hero.description"></p>
+        <div class="hero-ctas">
+          <a href="research.html" class="btn btn-primary"><span data-i18n="hero.ctaResearch"></span><i data-icon="arrow" data-size="16"></i></a>
+          <a href="contact.html" class="btn btn-ghost" data-i18n="hero.ctaContact"></a>
+        </div>
+      </div>
+      <div class="hero-scroll" aria-hidden="true">
+        <span class="lbl" data-i18n="heroExtra.scroll"></span>
+        <i data-icon="chevron" data-size="16"></i>
+      </div>
+    </section>
+
+    <!-- STATS -->
+    <section class="pad bg-white">
+      <div class="container">
+        <div class="section-head">
+          <div class="reveal"><span class="eyebrow" data-i18n="sections.stats.eyebrow"></span></div>
+          <h2 class="section-title reveal" data-i18n="sections.stats.title"></h2>
+        </div>
+        <ul class="grid-stats reveal-stagger">
+          <li class="card stat"><div class="ico"><i data-icon="users" data-size="20"></i></div><div class="num" data-counter data-to="40" data-suffix="+">0</div><p class="lbl" data-i18n="stats.researchers"></p></li>
+          <li class="card stat"><div class="ico"><i data-icon="rocket" data-size="20"></i></div><div class="num" data-counter data-to="25" data-suffix="">0</div><p class="lbl" data-i18n="stats.projects"></p></li>
+          <li class="card stat"><div class="ico"><i data-icon="book" data-size="20"></i></div><div class="num" data-counter data-to="180" data-suffix="+">0</div><p class="lbl" data-i18n="stats.publications"></p></li>
+          <li class="card stat"><div class="ico"><i data-icon="flask" data-size="20"></i></div><div class="num" data-counter data-to="60" data-suffix="">0</div><p class="lbl" data-i18n="stats.events"></p></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- RESEARCH AREAS -->
+    <section class="pad bg-alt" id="research">
+      <div class="container">
+        <div class="section-head">
+          <div class="reveal"><span class="eyebrow" data-i18n="homeResearch.eyebrow"></span></div>
+          <h2 class="section-title reveal" data-i18n="homeResearch.title"></h2>
+          <p class="section-sub reveal" data-i18n="homeResearch.subtitle"></p>
+        </div>
+        <ul class="grid-research reveal-stagger" id="home-research"></ul>
+      </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section class="pad bg-white">
+      <div class="container">
+        <div class="section-head">
+          <div class="reveal"><span class="eyebrow" data-i18n="sections.projects.eyebrow"></span></div>
+          <h2 class="section-title reveal" data-i18n="sections.projects.title"></h2>
+          <p class="section-sub reveal" data-i18n="sections.projects.subtitle"></p>
+        </div>
+        <ul class="grid-projects reveal-stagger">
+          <li class="card project"><a href="#"><div class="cover p1"><span class="tag">Artificial Intelligence</span></div><div class="body"><div><h3>Neural Language Models for Portuguese</h3><p>Domain-specific transformer models trained on scientific corpora.</p></div><span class="arrow"><i data-icon="arrow-ur" data-size="16"></i></span></div></a></li>
+          <li class="card project"><a href="#"><div class="cover p2"><span class="tag">Networks and Communications</span></div><div class="body"><div><h3>Urban Sensor Mesh, Porto</h3><p>Low-power communication networks supporting citywide sensing and mobility analysis.</p></div><span class="arrow"><i data-icon="arrow-ur" data-size="16"></i></span></div></a></li>
+          <li class="card project"><a href="#"><div class="cover p3"><span class="tag">Software Engineering</span></div><div class="body"><div><h3>Collaborative Research Platforms</h3><p>Reliable digital environments for interdisciplinary research and knowledge sharing.</p></div><span class="arrow"><i data-icon="arrow-ur" data-size="16"></i></span></div></a></li>
+          <li class="card project"><a href="#"><div class="cover p4"><span class="tag">Data Science</span></div><div class="body"><div><h3>Zero-Trust Data Vaults</h3><p>Secure data workflows for decentralized identity, privacy and analytics.</p></div><span class="arrow"><i data-icon="arrow-ur" data-size="16"></i></span></div></a></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- PUBLICATIONS -->
+    <section class="pad bg-alt">
+      <div class="container">
+        <div class="section-head">
+          <div class="reveal"><span class="eyebrow" data-i18n="sections.publications.eyebrow"></span></div>
+          <h2 class="section-title reveal" data-i18n="sections.publications.title"></h2>
+          <p class="section-sub reveal" data-i18n="sections.publications.subtitle"></p>
+        </div>
+        <div class="pub-tools reveal">
+          <label class="pub-search">
+            <i data-icon="search" data-size="16"></i>
+            <input id="pub-search-input" type="search" data-i18n-attr="placeholder:sections.publications.search">
+          </label>
+        </div>
+        <div class="pub-cats reveal">
+          <button class="cat-btn active" data-cat="All" data-i18n="sections.publications.all">All</button>
+          <button class="cat-btn" data-cat="Information Technologies">Information Technologies</button>
+          <button class="cat-btn" data-cat="Computer Science">Computer Science</button>
+          <button class="cat-btn" data-cat="Software Engineering">Software Engineering</button>
+          <button class="cat-btn" data-cat="Networks and Communications">Networks and Communications</button>
+          <button class="cat-btn" data-cat="Artificial Intelligence">Artificial Intelligence</button>
+          <button class="cat-btn" data-cat="Data Science">Data Science</button>
+          <button class="cat-btn" data-cat="Digital Transformation">Digital Transformation</button>
+        </div>
+        <div class="timeline">
+          <ul class="pub-list reveal-stagger" id="pub-list">
+            <li class="pub" data-cat="Artificial Intelligence" data-title="Contrastive pretraining for scientific literature retrieval"><span class="dot"></span><a href="#" class="pub-card"><div class="pub-meta"><div><span class="year">2025</span><span class="cat">Artificial Intelligence</span></div><div><h3>Contrastive pretraining for scientific literature retrieval</h3><small>ACL 2025</small></div></div><span class="pub-read"><span data-i18n="sections.publications.read"></span> <i data-icon="arrow-ur" data-size="16"></i></span></a></li>
+            <li class="pub" data-cat="Networks and Communications" data-title="Federated sensing at the urban edge: a Porto case study"><span class="dot"></span><a href="#" class="pub-card"><div class="pub-meta"><div><span class="year">2025</span><span class="cat">Networks and Communications</span></div><div><h3>Federated sensing at the urban edge: a Porto case study</h3><small>IEEE Network</small></div></div><span class="pub-read"><span data-i18n="sections.publications.read"></span> <i data-icon="arrow-ur" data-size="16"></i></span></a></li>
+            <li class="pub" data-cat="Data Science" data-title="Research publication example"><span class="dot"></span><a href="#" class="pub-card"><div class="pub-meta"><div><span class="year">2024</span><span class="cat">Data Science</span></div><div><h3>Research publication example</h3><small>CITECA Research</small></div></div><span class="pub-read"><span data-i18n="sections.publications.read"></span> <i data-icon="arrow-ur" data-size="16"></i></span></a></li>
+            <li class="pub" data-cat="Software Engineering" data-title="Secure software lifecycle patterns for research platforms"><span class="dot"></span><a href="#" class="pub-card"><div class="pub-meta"><div><span class="year">2024</span><span class="cat">Software Engineering</span></div><div><h3>Secure software lifecycle patterns for research platforms</h3><small>Journal of Systems and Software</small></div></div><span class="pub-read"><span data-i18n="sections.publications.read"></span> <i data-icon="arrow-ur" data-size="16"></i></span></a></li>
+            <li class="pub" data-cat="Digital Transformation" data-title="Multimodal reasoning in low-resource languages"><span class="dot"></span><a href="#" class="pub-card"><div class="pub-meta"><div><span class="year">2023</span><span class="cat">Digital Transformation</span></div><div><h3>Multimodal reasoning in low-resource languages</h3><small>EMNLP 2023</small></div></div><span class="pub-read"><span data-i18n="sections.publications.read"></span> <i data-icon="arrow-ur" data-size="16"></i></span></a></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESEARCHERS -->
+    <section class="pad bg-white">
+      <div class="container">
+        <div class="section-head">
+          <div class="reveal"><span class="eyebrow" data-i18n="sections.researchers.eyebrow"></span></div>
+          <h2 class="section-title reveal" data-i18n="sections.researchers.title"></h2>
+          <p class="section-sub reveal" data-i18n="sections.researchers.subtitle"></p>
+        </div>
+        <ul class="grid-people reveal-stagger">
+          <li class="card person"><div class="avatar h1">AR</div><h3>Sample Researcher</h3><p class="role">Principal Investigator</p><ul class="tags"><li class="chip">NLP</li><li class="chip">ML</li></ul><div class="socials"><a href="#" class="social" aria-label="LinkedIn"><i data-icon="linkedin" data-size="14"></i></a><a href="#" class="social" aria-label="Twitter"><i data-icon="twitter" data-size="14"></i></a><a href="#" class="social" aria-label="GitHub"><i data-icon="github" data-size="14"></i></a></div></li>
+          <li class="card person"><div class="avatar h2">MC</div><h3>Sample Researcher</h3><p class="role">Networks & Communications Lead</p><ul class="tags"><li class="chip">Networks</li><li class="chip">Edge</li></ul><div class="socials"><a href="#" class="social" aria-label="LinkedIn"><i data-icon="linkedin" data-size="14"></i></a><a href="#" class="social" aria-label="Twitter"><i data-icon="twitter" data-size="14"></i></a><a href="#" class="social" aria-label="GitHub"><i data-icon="github" data-size="14"></i></a></div></li>
+          <li class="card person"><div class="avatar h3">JA</div><h3>Sample Researcher</h3><p class="role">Research Scientist</p><ul class="tags"><li class="chip">R</li><li class="chip">Optimization</li></ul><div class="socials"><a href="#" class="social" aria-label="LinkedIn"><i data-icon="linkedin" data-size="14"></i></a><a href="#" class="social" aria-label="Twitter"><i data-icon="twitter" data-size="14"></i></a><a href="#" class="social" aria-label="GitHub"><i data-icon="github" data-size="14"></i></a></div></li>
+          <li class="card person"><div class="avatar h4">SF</div><h3>Sample Researcher</h3><p class="role">Digital Transformation</p><ul class="tags"><li class="chip">Innovation</li><li class="chip">Technology Transfer</li></ul><div class="socials"><a href="#" class="social" aria-label="LinkedIn"><i data-icon="linkedin" data-size="14"></i></a><a href="#" class="social" aria-label="Twitter"><i data-icon="twitter" data-size="14"></i></a><a href="#" class="social" aria-label="GitHub"><i data-icon="github" data-size="14"></i></a></div></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- RESOURCES -->
+    <section class="pad bg-alt">
+      <div class="container">
+        <div class="section-head">
+          <div class="reveal"><span class="eyebrow" data-i18n="sections.resources.eyebrow"></span></div>
+          <h2 class="section-title reveal" data-i18n="sections.resources.title"></h2>
+          <p class="section-sub reveal" data-i18n="sections.resources.subtitle"></p>
+        </div>
+        <ul class="grid-res reveal-stagger">
+          <li><a href="#" class="res"><div class="ico"><i data-icon="file" data-size="20"></i></div><div class="body"><h3>CITECA Annual Report 2024</h3><small>PDF · 4.2 MB</small></div><span class="dl" aria-label="Download"><i data-icon="download" data-size="16"></i></span></a></li>
+          <li><a href="#" class="res"><div class="ico"><i data-icon="database" data-size="20"></i></div><div class="body"><h3>Porto Urban Sensor Dataset</h3><small>CSV · 128 MB</small></div><span class="dl" aria-label="Download"><i data-icon="download" data-size="16"></i></span></a></li>
+          <li><a href="#" class="res"><div class="ico"><i data-icon="code" data-size="20"></i></div><div class="body"><h3>Research Repository</h3><small>GitHub · Open access</small></div><span class="dl" aria-label="Download"><i data-icon="download" data-size="16"></i></span></a></li>
+          <li><a href="#" class="res"><div class="ico"><i data-icon="bookmark" data-size="20"></i></div><div class="body"><h3>PQC Reference Implementation</h3><small>Repository</small></div><span class="dl" aria-label="Download"><i data-icon="download" data-size="16"></i></span></a></li>
+          <li><a href="#" class="res"><div class="ico"><i data-icon="file" data-size="20"></i></div><div class="body"><h3>Strategic Plan 2024–2027</h3><small>PDF · 1.8 MB</small></div><span class="dl" aria-label="Download"><i data-icon="download" data-size="16"></i></span></a></li>
+          <li><a href="#" class="res"><div class="ico"><i data-icon="database" data-size="20"></i></div><div class="body"><h3>Multilingual Scientific Corpus</h3><small>Parquet · 2.4 GB</small></div><span class="dl" aria-label="Download"><i data-icon="download" data-size="16"></i></span></a></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="pad bg-white" id="contact">
+      <div class="container">
+        <div class="contact-grid">
+          <div class="reveal">
+            <span class="eyebrow" data-i18n="contact.eyebrow"></span>
+            <h2 class="section-title" data-i18n="contact.title"></h2>
+            <p class="section-sub" style="max-width:520px" data-i18n="contact.subtitle"></p>
+            <ul class="contact-info">
+              <li class="contact-item"><span class="ico"><i data-icon="map" data-size="20"></i></span><div><p class="lbl" data-i18n="contact.addressLabel"></p><p class="val">R. de Silva Tapada 115, 4200-501 Porto, Portugal</p></div></li>
+              <li class="contact-item"><span class="ico"><i data-icon="mail" data-size="20"></i></span><div><p class="lbl" data-i18n="contact.emailLabel"></p><a class="val" href="mailto:citeca@istec.pt">citeca@istec.pt</a></div></li>
+              <li class="contact-item"><span class="ico"><i data-icon="phone" data-size="20"></i></span><div><p class="lbl" data-i18n="contact.phoneLabel"></p><a class="val" href="tel:+351220108100">+351 220 108 100</a></div></li>
+            </ul>
+          </div>
+          <form class="form contact-form reveal" aria-labelledby="fh1">
+            <h3 id="fh1" data-i18n="contact.formTitle"></h3>
+            <p class="hint" data-i18n="contact.required"></p>
+            <div class="fields">
+              <label class="field"><span data-i18n="contact.name"></span><input id="c-name" type="text" required></label>
+              <label class="field"><span data-i18n="contact.email"></span><input id="c-email" type="email" required></label>
+              <label class="field"><span data-i18n="contact.subject"></span><input id="c-subject" type="text" required></label>
+              <label class="field"><span data-i18n="contact.message"></span><textarea id="c-message" rows="5" required></textarea></label>
+            </div>
+            <button type="submit" class="btn btn-solid" style="margin-top:32px"><span data-i18n="contact.send"></span><i data-icon="arrow" data-size="16"></i></button>
+            <p class="sent" role="status" hidden></p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site"></footer>
+  <script src="partials.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contact CITECA — ISTEC Porto</title>
+  <meta name="description" content="Get in touch with CITECA — the ISTEC Porto research center for advanced technologies.">
+  <link rel="icon" href="assets/logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="progress" aria-hidden="true"></div>
+  <header class="header" data-active="contact"></header>
+  <main id="main">
+    <section class="page-hero">
+      <div class="inner">
+        <p class="eb" data-i18n="contact.eyebrow"></p>
+        <h1 data-i18n="contact.title"></h1>
+        <p data-i18n="contact.subtitle"></p>
+      </div>
+    </section>
+    <section class="pad bg-white">
+      <div class="container">
+        <div class="contact-grid">
+          <div class="reveal">
+            <h2 class="section-title" style="font-size:24px;margin-top:0" data-i18n="contact.infoTitle"></h2>
+            <ul class="contact-info">
+              <li class="contact-item"><span class="ico"><i data-icon="map" data-size="20"></i></span><div><p class="lbl" data-i18n="contact.addressLabel"></p><p class="val">ISTEC Porto<br>R. de Silva Tapada 115<br>4200-501 Porto, Portugal</p></div></li>
+              <li class="contact-item"><span class="ico"><i data-icon="mail" data-size="20"></i></span><div><p class="lbl" data-i18n="contact.emailLabel"></p><a class="val" href="mailto:citeca@istec.pt">citeca@istec.pt</a></div></li>
+              <li class="contact-item"><span class="ico"><i data-icon="phone" data-size="20"></i></span><div><p class="lbl" data-i18n="contact.phoneLabel"></p><a class="val" href="tel:+351220108100">+351 220 108 100</a></div></li>
+            </ul>
+          </div>
+          <form class="form contact-form reveal" aria-labelledby="fh2">
+            <h3 id="fh2" data-i18n="contact.formTitle"></h3>
+            <p class="hint" data-i18n="contact.required"></p>
+            <div class="fields">
+              <label class="field"><span data-i18n="contact.name"></span><input type="text" required autocomplete="name"></label>
+              <label class="field"><span data-i18n="contact.email"></span><input type="email" required autocomplete="email"></label>
+              <label class="field"><span data-i18n="contact.subject"></span><input type="text" required></label>
+              <label class="field"><span data-i18n="contact.message"></span><textarea rows="6" required></textarea></label>
+            </div>
+            <button type="submit" class="btn btn-solid" style="margin-top:32px"><span data-i18n="contact.send"></span><i data-icon="arrow" data-size="16"></i></button>
+            <p class="sent" role="status" hidden></p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="site"></footer>
+  <script src="partials.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
