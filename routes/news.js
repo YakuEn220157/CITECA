@@ -9,7 +9,7 @@ const fallbackNews = [
 
 router.get("/", async (req, res) => {
   try {
-    const [rows] = await db.query("SELECT id, title, summary, published_at FROM news ORDER BY published_at DESC");
+    const rows = await db.query("SELECT id, title, summary, published_at FROM news ORDER BY published_at DESC");
     res.json(rows.length ? rows : fallbackNews);
   } catch (error) {
     res.json(fallbackNews);

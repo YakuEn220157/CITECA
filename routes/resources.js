@@ -10,7 +10,7 @@ const fallbackResources = [
 
 router.get("/", async (req, res) => {
   try {
-    const [rows] = await db.query("SELECT id, name, category, link FROM resources ORDER BY id");
+    const rows = await db.query("SELECT id, name, category, link FROM resources ORDER BY id");
     res.json(rows.length ? rows : fallbackResources);
   } catch (error) {
     res.json(fallbackResources);

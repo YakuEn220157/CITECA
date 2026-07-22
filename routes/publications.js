@@ -10,7 +10,7 @@ const fallbackPublications = [
 
 router.get("/", async (req, res) => {
   try {
-    const [rows] = await db.query("SELECT id, title, year, type FROM publications ORDER BY year DESC");
+    const rows = await db.query("SELECT id, title, year, type FROM publications ORDER BY year DESC");
     res.json(rows.length ? rows : fallbackPublications);
   } catch (error) {
     res.json(fallbackPublications);

@@ -10,7 +10,7 @@ const fallbackEvents = [
 
 router.get("/", async (req, res) => {
   try {
-    const [rows] = await db.query("SELECT id, title, date, venue FROM events ORDER BY date ASC");
+    const rows = await db.query("SELECT id, title, date, venue FROM events ORDER BY date ASC");
     res.json(rows.length ? rows : fallbackEvents);
   } catch (error) {
     res.json(fallbackEvents);

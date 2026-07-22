@@ -11,7 +11,7 @@ const fallbackProjects = [
 
 router.get("/", async (req, res) => {
   try {
-    const [rows] = await db.query("SELECT id, title, category, summary, cover FROM projects ORDER BY id");
+    const rows = await db.query("SELECT id, title, category, summary, cover FROM projects ORDER BY id");
     res.json(rows.length ? rows : fallbackProjects);
   } catch (error) {
     res.json(fallbackProjects);
