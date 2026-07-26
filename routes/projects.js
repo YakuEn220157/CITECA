@@ -1,20 +1,52 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../db");
-
-const fallbackProjects = [
-  { id: 1, title: "Neural Language Models for Portuguese", category: "Artificial Intelligence", summary: "Domain-specific transformer models trained on scientific corpora.", cover: "p1" },
-  { id: 2, title: "Urban Sensor Mesh, Porto", category: "Networks and Communications", summary: "Low-power communication networks supporting citywide sensing and mobility analysis.", cover: "p2" },
-  { id: 3, title: "Collaborative Research Platforms", category: "Software Engineering", summary: "Reliable digital environments for interdisciplinary research and knowledge sharing.", cover: "p3" },
-  { id: 4, title: "Zero-Trust Data Vaults", category: "Data Science", summary: "Secure data workflows for decentralized identity, privacy and analytics.", cover: "p4" },
-];
+const { verifyToken } = require("./auth");
 
 router.get("/", async (req, res) => {
   try {
-    const rows = await db.query("SELECT id, title, category, summary, cover FROM projects ORDER BY id");
-    res.json(rows.length ? rows : fallbackProjects);
+    const rows = await db.query("SELECT * FROM projects ORDER BY id DESC");
+    res.json(rows);
   } catch (error) {
-    res.json(fallbackProjects);
+    res.status(500).json({ ok: false, message: error.message });
+  }
+});
+
+router.post("/", verifyToken, async (req, res) => {
+  try {
+    const d = req.body;
+    const result = await db.query(
+      `INSERT INTO projects (title, category, summary, funding_entity, budget, start_date, end_date, principal_investigator, partners, image_url) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [d.title || "Untitled", d.category || "Research", d.summary || "", d.funding_entity || "", d.budget || null, d.start_date || null, d.end_date || null, d.principal_investigator || "", d.partners || "", d.image_url || ""]
+    );
+    res.status(201).json({ ok: true, id: Number(result.insertId) });
+  } catch (error) {
+    res.status(500).json({ ok: false, message: error.message });
+  }
+});
+
+// NEW: UPDATE PROJECT
+router.put("/:id", verifyToken, async (req, res) => {
+  try {
+    const d = req.body;
+    await db.query(
+      `UPDATE projects SET title=?, category=?, summary=?, funding_entity=?, budget=?, start_date=?, end_date=?, principal_investigator=?, partners=?, image_url=? WHERE id=?`,
+      [d.title || "Untitled", d.category || "Research", d.summary || "", d.funding_entity || "", d.budget || null, d.start_date || null, d.end_date || null, d.principal_investigator || "", d.partners || "", d.image_url || "", req.params.id]
+    );
+    res.json({ ok: true });
+  } catch (error) {
+    console.error("❌ PROJECT UPDATE ERROR:", error);
+    res.status(500).json({ ok: false, message: error.message });
+  }
+});
+
+router.delete("/:id", verifyToken, async (req, res) => {
+  try {
+    await db.query("DELETE FROM projects WHERE id = ?", [req.params.id]);
+    res.json({ ok: true });
+  } catch (error) {
+    res.status(500).json({ ok: false, message: error.message });
   }
 });
 

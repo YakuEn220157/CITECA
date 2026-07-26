@@ -1,20 +1,36 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const db = require("../db");
+const pool = require('../db');
 
-router.post("/", async (req, res) => {
+// Submit a contact message from the frontend form
+router.post('/', async (req, res) => {
+  let conn;
   try {
-    const { name, email, subject, message } = req.body;
-    const combinedMessage = [subject, message].filter(Boolean).join("\n\n");
+    const { name, email, message } = req.body;
+    conn = await pool.getConnection();
+    const result = await conn.query(
+      'INSERT INTO contacts (name, email, message) VALUES (?, ?, ?)',
+      [name, email, message]
+    );
+    res.status(201).json({ message: 'Message sent successfully', id: Number(result.insertId) });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) conn.release();
+  }
+});
 
-    if (!name || !email || !combinedMessage) {
-      return res.status(400).json({ ok: false, message: "Please provide name, email and message." });
-    }
-
-    await db.query("INSERT INTO contacts (name, email, message) VALUES (?, ?, ?)", [name, email, combinedMessage]);
-    res.status(201).json({ ok: true, message: "Contact submitted successfully." });
-  } catch (error) {
-    res.status(500).json({ ok: false, message: "Could not save the message yet.", error: error.message });
+// GET messages (for admin dashboard)
+router.get('/', async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const rows = await conn.query('SELECT * FROM contacts ORDER BY created_at DESC');
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) conn.release();
   }
 });
 

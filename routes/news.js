@@ -1,18 +1,34 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const db = require("../db");
+const pool = require('../db');
 
-const fallbackNews = [
-  { id: 1, title: "New collaboration with regional innovation hubs", summary: "A new partnership expands outreach and applied research opportunities.", published_at: "2025-03-20" },
-  { id: 2, title: "Open calls for doctoral mobility", summary: "The institute announces a new doctoral mobility scheme for partner institutions.", published_at: "2025-02-15" },
-];
-
-router.get("/", async (req, res) => {
+router.get('/', async (req, res) => {
+  let conn;
   try {
-    const rows = await db.query("SELECT id, title, summary, published_at FROM news ORDER BY published_at DESC");
-    res.json(rows.length ? rows : fallbackNews);
-  } catch (error) {
-    res.json(fallbackNews);
+    conn = await pool.getConnection();
+    const rows = await conn.query('SELECT * FROM news ORDER BY published_at DESC');
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) conn.release();
+  }
+});
+
+router.post('/', async (req, res) => {
+  let conn;
+  try {
+    const { title, summary, published_at } = req.body;
+    conn = await pool.getConnection();
+    const result = await conn.query(
+      'INSERT INTO news (title, summary, published_at) VALUES (?, ?, ?)',
+      [title, summary, published_at]
+    );
+    res.status(201).json({ message: 'News article added', id: Number(result.insertId) });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) conn.release();
   }
 });
 

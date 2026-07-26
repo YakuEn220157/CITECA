@@ -1,13 +1,13 @@
-const mariadb = require("mariadb");
-require("dotenv").config();
+const mariadb = require('mariadb');
+require('dotenv').config();
 
 const pool = mariadb.createPool({
-    host: process.env.DB_HOST,
-    port: Number(process.env.DB_PORT),
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    connectionLimit: 5
+  host: process.env.DB_HOST || 'localhost',
+  port: process.env.DB_PORT || 3306,
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'citeca',
+  connectionLimit: 5
 });
 
 module.exports = pool;

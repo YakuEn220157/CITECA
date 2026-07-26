@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CITECA Security & Administration Control</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <style>
+    :root { --primary: #0B3C6D; --accent: #1CA9C9; --danger: #e74c3c; --warning: #f39c12; --success: #2ecc71; --bg: #f4f7f6; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: #333; margin: 0; padding: 40px 20px; }
+    .auth-wrapper { max-width: 400px; margin: 100px auto; padding: 32px; background: white; border-radius: 12px; box-shadow: 0 4px 25px rgba(0,0,0,0.1); }
+    .dashboard-wrapper { max-width: 1000px; margin: 0 auto; padding: 32px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); display: none; }
+    h2, h3 { margin-top: 0; color: var(--primary); }
+    .tabs { display: flex; gap: 12px; margin-bottom: 24px; border-bottom: 2px solid #eee; }
+    .tab-btn { padding: 12px 24px; background: none; border: none; font-weight: 600; cursor: pointer; color: #666; font-size: 15px;}
+    .tab-btn.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+    .full-width { grid-column: span 2; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { font-weight: 600; font-size: 13px; color: #444; }
+    .form-group input, .form-group textarea, .form-group select { padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; font-family: inherit; }
+    .btn { padding: 12px 24px; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
+    .btn:hover { background: var(--accent); }
+    .btn-danger { background: var(--danger); padding: 8px 14px; font-size: 13px; }
+    .btn-danger:hover { background: #c0392b; }
+    .btn-warning { background: var(--warning); padding: 8px 14px; font-size: 13px; margin-right: 8px; }
+    .btn-warning:hover { background: #d68910; }
+    .btn-secondary { background: #95a5a6; }
+    .btn-secondary:hover { background: #7f8c8d; }
+    .item-card { display: flex; justify-content: space-between; align-items: center; background: #f9fbfd; border: 1px solid #e2e8f0; padding: 16px; border-radius: 8px; margin-bottom: 12px; }
+    
+    .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px;}
+    .toast { padding: 16px 24px; color: white; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); animation: slideIn 0.3s ease; font-weight: 500; font-size: 14px;}
+    .toast.success { background: var(--success); }
+    .toast.error { background: var(--danger); }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  </style>
+</head>
+<body>
+
+  <div class="toast-container" id="toast-view"></div>
+
+  <div id="auth-panel" class="auth-wrapper">
+    <h2>Secure Admin Access</h2>
+    <form id="form-login">
+      <div class="form-group" style="margin-bottom:14px;"><label>Username</label><input type="text" id="auth-user" required></div>
+      <div class="form-group" style="margin-bottom:20px;"><label>Password</label><input type="password" id="auth-pass" required></div>
+      <button type="submit" class="btn" style="width:100%">Verify Credentials</button>
+    </form>
+  </div>
+
+  <div id="admin-panel" class="dashboard-wrapper">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <h2>CITECA Control Panel</h2>
+      <button class="btn btn-danger" onclick="logout()">Logout</button>
+    </div>
+    
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab(event, 'pane-events')">Manage Events</button>
+      <button class="tab-btn" onclick="switchTab(event, 'pane-researchers')">Manage Researchers</button>
+      <button class="tab-btn" onclick="switchTab(event, 'pane-projects')">Manage Projects</button>
+    </div>
+
+    <div id="pane-events" class="tab-content active">
+      <form id="form-extended-event">
+        <div class="form-grid">
+          <div class="form-group"><label>Event Title</label><input type="text" id="ev-title" placeholder="Untitled Event"></div>
+          <div class="form-group"><label>Category Tag</label><input type="text" id="ev-category" placeholder="Workshop, Conference"></div>
+          <div class="form-group"><label>Start Date</label><input type="date" id="ev-date"></div>
+          <div class="form-group"><label>End Date</label><input type="date" id="ev-enddate"></div>
+          <div class="form-group"><label>Start Time (HH:MM)</label><input type="time" id="ev-time"></div>
+          <div class="form-group"><label>End Time (HH:MM)</label><input type="time" id="ev-timeend"></div>
+          <div class="form-group"><label>Venue / Hall</label><input type="text" id="ev-venue"></div>
+          <div class="form-group"><label>Keynote Speaker</label><input type="text" id="ev-speaker"></div>
+          <div class="form-group"><label>Registration URL</label><input type="url" id="ev-reg"></div>
+          <div class="form-group"><label>Image/Banner URL</label><input type="text" id="ev-img" placeholder="https://..."></div>
+          <div class="form-group full-width"><label>Detailed Description</label><textarea id="ev-desc" rows="3"></textarea></div>
+        </div>
+        <div>
+          <button type="submit" id="btn-submit-events" class="btn">Save New Event</button>
+          <button type="button" id="btn-cancel-events" class="btn btn-secondary" style="display:none;" onclick="cancelEdit('events')">Cancel Edit</button>
+        </div>
+      </form>
+      <div style="margin-top:40px;"><h3>Existing Events</h3><div id="render-events"></div></div>
+    </div>
+
+    <div id="pane-researchers" class="tab-content">
+      <form id="form-extended-researcher">
+        <div class="form-grid">
+          <div class="form-group"><label>Full Legal Name</label><input type="text" id="res-name" placeholder="Dr. John Doe"></div>
+          <div class="form-group"><label>Institutional Role</label><input type="text" id="res-role" placeholder="Senior Fellow"></div>
+          <div class="form-group"><label>Membership Level</label>
+            <select id="res-status"><option value="Integrated Member">Integrated Member</option><option value="Collaborating Member">Collaborating Member</option><option value="Student Researcher">Student Researcher</option></select>
+          </div>
+          <div class="form-group"><label>Contact Email</label><input type="email" id="res-email"></div>
+          <div class="form-group"><label>ORCID iD</label><input type="text" id="res-orcid"></div>
+          <div class="form-group"><label>Ciência ID</label><input type="text" id="res-ciencia"></div>
+          <div class="form-group"><label>Google Scholar URL</label><input type="url" id="res-scholar"></div>
+          <div class="form-group"><label>LinkedIn URL</label><input type="url" id="res-linkedin"></div>
+          <div class="form-group"><label>Profile Photo URL</label><input type="text" id="res-img"></div>
+          <div class="form-group full-width"><label>Primary Area of Expertise</label><input type="text" id="res-areas" placeholder="AI, Deep Learning"></div>
+          <div class="form-group full-width"><label>Academic Biography</label><textarea id="res-bio" rows="3"></textarea></div>
+        </div>
+        <div>
+          <button type="submit" id="btn-submit-researchers" class="btn">Save New Profile</button>
+          <button type="button" id="btn-cancel-researchers" class="btn btn-secondary" style="display:none;" onclick="cancelEdit('researchers')">Cancel Edit</button>
+        </div>
+      </form>
+      <div style="margin-top:40px;"><h3>Existing Faculty</h3><div id="render-researchers"></div></div>
+    </div>
+
+    <div id="pane-projects" class="tab-content">
+      <form id="form-extended-project">
+        <div class="form-grid">
+          <div class="form-group"><label>Project Title</label><input type="text" id="proj-title" placeholder="Project Name"></div>
+          <div class="form-group"><label>Category</label><input type="text" id="proj-category"></div>
+          <div class="form-group"><label>Funding Body (e.g., FCT)</label><input type="text" id="proj-funding"></div>
+          <div class="form-group"><label>Budget (€)</label><input type="number" step="0.01" id="proj-budget"></div>
+          <div class="form-group"><label>Start Date</label><input type="date" id="proj-start"></div>
+          <div class="form-group"><label>End Date</label><input type="date" id="proj-end"></div>
+          <div class="form-group"><label>Principal Investigator (PI)</label><input type="text" id="proj-pi"></div>
+          <div class="form-group"><label>Banner Image URL</label><input type="text" id="proj-img"></div>
+          <div class="form-group full-width"><label>Consortium Partners</label><input type="text" id="proj-partners" placeholder="Partner Alpha, Partner Beta"></div>
+          <div class="form-group full-width"><label>Executive Summary</label><textarea id="proj-summary" rows="3"></textarea></div>
+        </div>
+        <div>
+          <button type="submit" id="btn-submit-projects" class="btn">Save New Project</button>
+          <button type="button" id="btn-cancel-projects" class="btn btn-secondary" style="display:none;" onclick="cancelEdit('projects')">Cancel Edit</button>
+        </div>
+      </form>
+      <div style="margin-top:40px;"><h3>Existing Projects</h3><div id="render-projects"></div></div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'http://localhost:3000/api';
+    let sessionToken = localStorage.getItem('citeca_auth_token');
+
+    // GLOBAL MEMORY STATE
+    let DB = { events: [], researchers: [], projects: [] };
+    let editMode = { events: null, researchers: null, projects: null };
+
+    // UTILITIES
+    function notify(msg, type='success') {
+      const el = document.createElement('div'); el.className = `toast ${type}`; el.textContent = msg;
+      document.getElementById('toast-view').appendChild(el); setTimeout(() => el.remove(), 4000);
+    }
+
+    function formatDateForInput(dateString) {
+      if (!dateString) return '';
+      try { return new Date(dateString).toISOString().split('T')[0]; } catch { return ''; }
+    }
+
+    function checkAuthenticationState() {
+      if(sessionToken) {
+        document.getElementById('auth-panel').style.display = 'none';
+        document.getElementById('admin-panel').style.display = 'block';
+        fetchAllRecords();
+      } else {
+        document.getElementById('auth-panel').style.display = 'block';
+        document.getElementById('admin-panel').style.display = 'none';
+      }
+    }
+
+    document.getElementById('form-login').onsubmit = async (e) => {
+      e.preventDefault();
+      try {
+        const res = await fetch(`${API_URL}/auth/login`, {
+          method: 'POST', headers: {'Content-Type':'application/json'}, 
+          body: JSON.stringify({username: document.getElementById('auth-user').value, password: document.getElementById('auth-pass').value})
+        });
+        const data = await res.json();
+        if(res.ok && data.token) {
+          localStorage.setItem('citeca_auth_token', data.token); sessionToken = data.token;
+          notify('Authentication successful.'); checkAuthenticationState();
+        } else { notify(data.message || 'Invalid credentials.', 'error'); }
+      } catch { notify('Server connection failed.', 'error'); }
+    };
+
+    function logout() {
+      localStorage.removeItem('citeca_auth_token'); sessionToken = null;
+      notify('Logged out successfully.'); checkAuthenticationState();
+    }
+
+    function switchTab(e, paneId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(paneId).classList.add('active'); e.target.classList.add('active');
+    }
+
+    async function securedRequest(url, method='GET', payload=null) {
+      const headers = { 'Authorization': `Bearer ${sessionToken}` };
+      if(payload) headers['Content-Type'] = 'application/json';
+      return fetch(url, { method, headers, body: payload ? JSON.stringify(payload) : null });
+    }
+
+    // LOAD DATA
+    async function fetchAllRecords() {
+      // Fetch & Store Events
+      const resEv = await securedRequest(`${API_URL}/events`);
+      if(resEv.ok) {
+        DB.events = await resEv.json();
+        document.getElementById('render-events').innerHTML = DB.events.map(d => `
+          <div class="item-card">
+            <div><strong>${d.title || 'Untitled Event'}</strong><br><span style="color:#666; font-size:13px;">📅 ${d.event_date ? new Date(d.event_date).toLocaleDateString() : 'No Date'}</span></div>
+            <div>
+              <button class="btn btn-warning" onclick="startEdit('events', ${d.id})">Edit</button>
+              <button class="btn btn-danger" onclick="executeRemoval('events', ${d.id})">Delete</button>
+            </div>
+          </div>`).join('');
+      }
+
+      // Fetch & Store Researchers
+      const resRes = await securedRequest(`${API_URL}/researchers`);
+      if(resRes.ok) {
+        DB.researchers = await resRes.json();
+        document.getElementById('render-researchers').innerHTML = DB.researchers.map(d => `
+          <div class="item-card">
+            <div><strong>${d.name || d.full_name || 'Unnamed'}</strong><br><span style="color:#666; font-size:13px;">💼 ${d.role || d.position || 'Academic Staff'}</span></div>
+            <div>
+              <button class="btn btn-warning" onclick="startEdit('researchers', ${d.id})">Edit</button>
+              <button class="btn btn-danger" onclick="executeRemoval('researchers', ${d.id})">Delete</button>
+            </div>
+          </div>`).join('');
+      }
+
+      // Fetch & Store Projects
+      const resProj = await securedRequest(`${API_URL}/projects`);
+      if(resProj.ok) {
+        DB.projects = await resProj.json();
+        document.getElementById('render-projects').innerHTML = DB.projects.map(d => `
+          <div class="item-card">
+            <div><strong>${d.title || 'Untitled Project'}</strong><br><span style="color:#666; font-size:13px;">📁 ${d.category || 'General'}</span></div>
+            <div>
+              <button class="btn btn-warning" onclick="startEdit('projects', ${d.id})">Edit</button>
+              <button class="btn btn-danger" onclick="executeRemoval('projects', ${d.id})">Delete</button>
+            </div>
+          </div>`).join('');
+      }
+    }
+
+    // DELETE LOGIC
+    async function executeRemoval(endpoint, id) {
+      if(!confirm('Permanently delete this record?')) return;
+      const res = await securedRequest(`${API_URL}/${endpoint}/${id}`, 'DELETE');
+      if(res.ok) { notify('Record erased.'); fetchAllRecords(); } else { notify('Deletion failed.', 'error'); }
+    }
+
+    // EDIT UI STATE LOGIC
+    function startEdit(type, id) {
+      editMode[type] = id;
+      const item = DB[type].find(i => i.id === id);
+      if (!item) return;
+
+      if (type === 'events') {
+        document.getElementById('ev-title').value = item.title || '';
+        document.getElementById('ev-category').value = item.category || '';
+        document.getElementById('ev-date').value = formatDateForInput(item.event_date);
+        document.getElementById('ev-enddate').value = formatDateForInput(item.end_date);
+        document.getElementById('ev-time').value = item.start_time || '';
+        document.getElementById('ev-timeend').value = item.end_time || '';
+        document.getElementById('ev-venue').value = item.venue || '';
+        document.getElementById('ev-speaker').value = item.speaker || '';
+        document.getElementById('ev-reg').value = item.registration_link || '';
+        document.getElementById('ev-img').value = item.image_url || '';
+        document.getElementById('ev-desc').value = item.description || '';
+        document.getElementById('btn-submit-events').textContent = 'Update Event';
+        document.getElementById('btn-cancel-events').style.display = 'inline-block';
+      } 
+      else if (type === 'researchers') {
+        document.getElementById('res-name').value = item.name || item.full_name || '';
+        document.getElementById('res-role').value = item.role || item.position || '';
+        document.getElementById('res-status').value = item.status_membership || 'Integrated Member';
+        document.getElementById('res-email').value = item.email || '';
+        document.getElementById('res-orcid').value = item.orcid_id || '';
+        document.getElementById('res-ciencia').value = item.ciencia_id || '';
+        document.getElementById('res-scholar').value = item.google_scholar || '';
+        document.getElementById('res-linkedin').value = item.linkedin_url || '';
+        document.getElementById('res-img').value = item.image_url || '';
+        document.getElementById('res-areas').value = item.research_areas || item.expertise || '';
+        document.getElementById('res-bio').value = item.bio || '';
+        document.getElementById('btn-submit-researchers').textContent = 'Update Profile';
+        document.getElementById('btn-cancel-researchers').style.display = 'inline-block';
+      }
+      else if (type === 'projects') {
+        document.getElementById('proj-title').value = item.title || '';
+        document.getElementById('proj-category').value = item.category || '';
+        document.getElementById('proj-funding').value = item.funding_entity || '';
+        document.getElementById('proj-budget').value = item.budget || '';
+        document.getElementById('proj-start').value = formatDateForInput(item.start_date);
+        document.getElementById('proj-end').value = formatDateForInput(item.end_date);
+        document.getElementById('proj-pi').value = item.principal_investigator || '';
+        document.getElementById('proj-img').value = item.image_url || '';
+        document.getElementById('proj-partners').value = item.partners || '';
+        document.getElementById('proj-summary').value = item.summary || '';
+        document.getElementById('btn-submit-projects').textContent = 'Update Project';
+        document.getElementById('btn-cancel-projects').style.display = 'inline-block';
+      }
+      window.scrollTo(0, 0); // Jump back to top where form is
+      notify(`Editing mode active.`);
+    }
+
+    function cancelEdit(type) {
+      editMode[type] = null;
+      if (type === 'events') {
+        document.getElementById('form-extended-event').reset();
+        document.getElementById('btn-submit-events').textContent = 'Save New Event';
+        document.getElementById('btn-cancel-events').style.display = 'none';
+      } else if (type === 'researchers') {
+        document.getElementById('form-extended-researcher').reset();
+        document.getElementById('btn-submit-researchers').textContent = 'Save New Profile';
+        document.getElementById('btn-cancel-researchers').style.display = 'none';
+      } else if (type === 'projects') {
+        document.getElementById('form-extended-project').reset();
+        document.getElementById('btn-submit-projects').textContent = 'Save New Project';
+        document.getElementById('btn-cancel-projects').style.display = 'none';
+      }
+    }
+
+    // SUBMISSION LOGIC (Smart: Creates or Updates)
+    document.getElementById('form-extended-event').onsubmit = async (e) => {
+      e.preventDefault();
+      const payload = {
+        title: document.getElementById('ev-title').value, category: document.getElementById('ev-category').value,
+        event_date: document.getElementById('ev-date').value || null, end_date: document.getElementById('ev-enddate').value || null,
+        start_time: document.getElementById('ev-time').value || null, end_time: document.getElementById('ev-timeend').value || null,
+        venue: document.getElementById('ev-venue').value, speaker: document.getElementById('ev-speaker').value,
+        registration_link: document.getElementById('ev-reg').value, image_url: document.getElementById('ev-img').value,
+        description: document.getElementById('ev-desc').value
+      };
+      
+      const isUpdating = editMode.events !== null;
+      const endpoint = isUpdating ? `${API_URL}/events/${editMode.events}` : `${API_URL}/events`;
+      const method = isUpdating ? 'PUT' : 'POST';
+
+      const res = await securedRequest(endpoint, method, payload);
+      if(res.ok) { 
+        notify(`Event ${isUpdating ? 'updated' : 'saved'} successfully.`); 
+        cancelEdit('events'); fetchAllRecords(); 
+      } else { notify('Failed to save data.', 'error'); }
+    };
+
+    document.getElementById('form-extended-researcher').onsubmit = async (e) => {
+      e.preventDefault();
+      const payload = {
+        name: document.getElementById('res-name').value, full_name: document.getElementById('res-name').value,
+        role: document.getElementById('res-role').value, position: document.getElementById('res-role').value,
+        email: document.getElementById('res-email').value, orcid_id: document.getElementById('res-orcid').value,
+        ciencia_id: document.getElementById('res-ciencia').value, google_scholar: document.getElementById('res-scholar').value,
+        linkedin_url: document.getElementById('res-linkedin').value, image_url: document.getElementById('res-img').value,
+        research_areas: document.getElementById('res-areas').value, expertise: document.getElementById('res-areas').value,
+        status_membership: document.getElementById('res-status').value, bio: document.getElementById('res-bio').value
+      };
+
+      const isUpdating = editMode.researchers !== null;
+      const endpoint = isUpdating ? `${API_URL}/researchers/${editMode.researchers}` : `${API_URL}/researchers`;
+      const method = isUpdating ? 'PUT' : 'POST';
+
+      const res = await securedRequest(endpoint, method, payload);
+      if(res.ok) { 
+        notify(`Profile ${isUpdating ? 'updated' : 'saved'} successfully.`); 
+        cancelEdit('researchers'); fetchAllRecords(); 
+      } else { notify('Failed to save data.', 'error'); }
+    };
+
+    document.getElementById('form-extended-project').onsubmit = async (e) => {
+      e.preventDefault();
+      const payload = {
+        title: document.getElementById('proj-title').value, category: document.getElementById('proj-category').value,
+        funding_entity: document.getElementById('proj-funding').value, budget: document.getElementById('proj-budget').value || null,
+        start_date: document.getElementById('proj-start').value || null, end_date: document.getElementById('proj-end').value || null,
+        principal_investigator: document.getElementById('proj-pi').value, image_url: document.getElementById('proj-img').value,
+        partners: document.getElementById('proj-partners').value, summary: document.getElementById('proj-summary').value
+      };
+
+      const isUpdating = editMode.projects !== null;
+      const endpoint = isUpdating ? `${API_URL}/projects/${editMode.projects}` : `${API_URL}/projects`;
+      const method = isUpdating ? 'PUT' : 'POST';
+
+      const res = await securedRequest(endpoint, method, payload);
+      if(res.ok) { 
+        notify(`Project ${isUpdating ? 'updated' : 'saved'} successfully.`); 
+        cancelEdit('projects'); fetchAllRecords(); 
+      } else { notify('Failed to save data.', 'error'); }
+    };
+
+    checkAuthenticationState();
+  </script>
+</body>
+</html>

@@ -67,7 +67,7 @@
         eyebrow: "Events",
         title: "Scientific events and knowledge exchange",
         description: "CITECA organizes and participates in events that promote discussion, collaboration and dissemination of research outcomes.",
-        focusTitle: "Upcoming activities",
+        focusTitle: "Our Activities",
         focusText: "Events remain a core channel for sharing expertise, engaging partners and strengthening the research community.",
       },
       footer: { description: "CITECA — ISTEC Porto Research Center for Advanced Technologies. Driving innovation through excellent scientific research and knowledge transfer.", quickLinks: "Quick Links", contact: "Contact", rights: "All rights reserved", wcag: "WCAG 2.1 AA compliant", newsletter: "Newsletter", newsletterDesc: "Quarterly updates on research, papers and events.", email: "you@domain.com" },
@@ -104,7 +104,7 @@
         eyebrow: "Sobre nós", title: "Sobre Nós",
         description: "O CITECA é o Centro de Investigação em Tecnologias Avançadas do ISTEC Porto, dedicado à excelência científica e à inovação tecnológica.",
         historyTitle: "História",
-        history: "Por despacho do Sr. Diretor do ISTEC-Porto foi criado em setembro de 2020 o Centro de Investigação em Tecnologias Avançadas (CITECA). A pandemia Covid-19, mudança de instalações e alterações no quadro de pessoal docente, implicaram que o programa inicialmente previsto tenha sido alterado; os objetivos propostos não foram alcançados, tendo o plano sofrido uma profunda remodelação. Assim o presente plano estratégico, que se pretende mais realista, foi revisto com base nos constrangimentos anteriormente havidos, mas com o reforço de novos investigadores, com base na contratação de novos docentes para o ISTEC Porto.",
+        history: "Por despacho do Sr. Diretor do ISTEC-Porto foi criado em setembro de 2020 o Centro de Investigação em Tecnologias Avançadas (CITECA). A pandemia Covid-19, mudança de instalações e alterações no quadro de pessoal docente, implicaram que o plano inicialmente previsto tenha sido alterado; os objetivos propostos não foram alcançados, tendo o plano sofrido uma profunda remodelação. Assim o presente plano estratégico, que se pretende mais realista, foi revisto com base nos constrangimentos anteriormente havidos, mas com o reforço de novos investigadores, com base na contratação de novos docentes para o ISTEC Porto.",
         missionTitle: "Missão",
         mission1: "O CITECA é o Centro de Investigação em Tecnologias Avançadas do ISTEC Porto, dedicado à investigação, inovação, cooperação e transferência de conhecimento em tecnologias avançadas.",
         mission2: "O seu trabalho assenta na excelência científica, na colaboração interdisciplinar e nas parcerias internacionais, com o objetivo de fortalecer a ligação entre a academia e o ecossistema socioeconómico através de investigação de alto impacto e conhecimento partilhado.",
@@ -113,7 +113,7 @@
         eyebrow: "Contacto", title: "Contacto",
         subtitle: "Entre em contacto connosco. Responderemos o mais brevemente possível.",
         infoTitle: "Informações de Contacto", addressLabel: "Morada", emailLabel: "Email", phoneLabel: "Telefone",
-        formTitle: "Envie-nos uma Mensagem", required: "Os campos marcados com * são obrigatórios.",
+        formTitle: "Envie-nos uma Mensagem", required: "Os campos marcados com * foram obrigatórios.",
         name: "Nome completo *", email: "Email *", subject: "Assunto *", message: "Mensagem *",
         send: "Enviar Mensagem", success: "Obrigado — entraremos em contacto em breve.",
       },
@@ -138,7 +138,7 @@
         eyebrow: "Eventos",
         title: "Eventos científicos e troca de conhecimento",
         description: "O CITECA organiza e participa em eventos que promovem discussão, colaboração e divulgação dos resultados de investigação.",
-        focusTitle: "Atividades futuras",
+        focusTitle: "As nossas atividades",
         focusText: "Os eventos continuam a ser um canal essencial para partilhar conhecimento, envolver parceiros e fortalecer a comunidade científica.",
       },
       footer: { description: "CITECA — Centro de Investigação em Tecnologias Avançadas do ISTEC Porto. A impulsionar a inovação através da investigação científica de excelência e transferência de conhecimento.", quickLinks: "Links Rápidos", contact: "Contactos", rights: "Todos os direitos reservados", wcag: "Em conformidade com WCAG 2.1 AA", newsletter: "Newsletter", newsletterDesc: "Atualizações trimestrais sobre investigação, artigos e eventos.", email: "voce@dominio.com" },
@@ -151,12 +151,7 @@
   let lang = readStoredLanguage();
 
   function readStoredLanguage() {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      return SUPPORTED_LANGUAGES.has(stored) ? stored : DEFAULT_LANGUAGE;
-    } catch {
-      return DEFAULT_LANGUAGE;
-    }
+    try { return SUPPORTED_LANGUAGES.has(localStorage.getItem(STORAGE_KEY)) ? localStorage.getItem(STORAGE_KEY) : DEFAULT_LANGUAGE; } catch { return DEFAULT_LANGUAGE; }
   }
 
   function getTranslationValue(obj, path) {
@@ -166,14 +161,11 @@
   function applyI18n() {
     const translationSet = translations[lang];
     document.documentElement.lang = lang;
-
     document.querySelectorAll("[data-i18n]").forEach((element) => {
       const value = getTranslationValue(translationSet, element.getAttribute("data-i18n"));
       if (typeof value === "string") element.textContent = value;
     });
-
     document.querySelectorAll("[data-i18n-attr]").forEach((element) => {
-      // format: "attr:path;attr2:path2"
       element.getAttribute("data-i18n-attr").split(";").forEach((pair) => {
         const [attributeName, path] = pair.split(":");
         if (!attributeName || !path) return;
@@ -181,167 +173,209 @@
         if (typeof value === "string") element.setAttribute(attributeName.trim(), value);
       });
     });
-
+    
+    // Safely apply the active classes to the toggle buttons
     document.querySelectorAll(".lang-toggle").forEach((button) => {
       button.setAttribute("aria-label", translationSet.switchTo);
       button.setAttribute("title", translationSet.switchTo);
-      button.querySelector(".en").classList.toggle("off", lang !== "en");
-      button.querySelector(".pt").classList.toggle("off", lang !== "pt");
+      const enEl = button.querySelector(".en");
+      const ptEl = button.querySelector(".pt");
+      if (enEl) enEl.classList.toggle("off", lang !== "en");
+      if (ptEl) ptEl.classList.toggle("off", lang !== "pt");
     });
 
     if (typeof window.renderResearch === "function") window.renderResearch(translationSet);
-    if (typeof window.renderPublications === "function") window.renderPublications(translationSet);
   }
 
-  function setLanguage(nextLanguage) {
-    lang = nextLanguage;
-    try { localStorage.setItem(STORAGE_KEY, nextLanguage); } catch {}
-    applyI18n();
-  }
-
-  window.__setLang = setLanguage;
+  window.__setLang = (nextLanguage) => { 
+    lang = nextLanguage; 
+    try { localStorage.setItem(STORAGE_KEY, nextLanguage); } catch {} 
+    applyI18n(); 
+  };
   window.__getLang = () => lang;
   window.__t = () => translations[lang];
 
+  // ==========================================
+  // API ENGINE
+  // ==========================================
+  const API_BASE = "http://localhost:3000/api";
   async function requestJson(endpoint, fallback) {
-    try {
-      const response = await fetch(endpoint);
-      if (!response.ok) throw new Error(`Request failed with status ${response.status}`);
-      return await response.json();
-    } catch (error) {
-      console.warn(`Unable to load ${endpoint}:`, error);
-      return fallback;
-    }
+    try { const response = await fetch(`${API_BASE}${endpoint}`); return response.ok ? await response.json() : fallback; } catch { return fallback; }
   }
 
-  async function populateDashboardStats() {
-    const values = await requestJson("/api/dashboard", { researchers: 40, projects: 25, publications: 180, events: 60 });
-    const counterElements = Array.from(document.querySelectorAll("[data-counter]"));
-    const numericValues = [values.researchers, values.projects, values.publications, values.events];
-
-    counterElements.forEach((element, index) => {
-      const targetValue = Number(numericValues[index] || 0);
-      const suffix = element.dataset.suffix || "";
-      element.dataset.to = String(targetValue);
-      element.textContent = `${targetValue.toLocaleString()}${suffix}`;
-    });
-  }
-
+  // 1. EXTENDED RESEARCHERS GRID
   async function populateResearchers() {
     const target = document.querySelector(".grid-people");
     if (!target) return;
-
-    const researchers = await requestJson("/api/researchers", []);
-    target.innerHTML = researchers.map((person, index) => {
-      const initials = (person.full_name || "Researcher")
-        .split(" ")
-        .map((word) => word[0] || "")
-        .join("")
-        .slice(0, 2)
-        .toUpperCase();
+    target.style.alignItems = "flex-start";
+    const researchers = await requestJson("/researchers", []);
+    target.innerHTML = researchers.map((p, index) => {
+      const name = p.name || p.full_name || "Researcher";
+      const fallbackInitials = name.split(" ").map(n=>n[0]).join("").slice(0,2).toUpperCase();
       const avatarClass = ["h1", "h2", "h3", "h4"][index % 4];
       return `
-        <li class="card person">
-          <div class="avatar ${avatarClass}">${initials}</div>
-          <h3>${person.full_name || "Researcher"}</h3>
-          <p class="role">${person.position || "Research Team Member"}</p>
-          <ul class="tags">
-            <li class="chip">${person.expertise || "Research"}</li>
-          </ul>
-          <div class="socials">
-            <a href="mailto:${person.email || "contact@istec.pt"}" class="social" aria-label="Email"><i data-icon="mail" data-size="14"></i></a>
+        <li class="card person" style="display: flex; flex-direction: column; padding: 20px;">
+          ${p.image_url ? `<img src="${p.image_url}" alt="${name}" class="avatar" style="object-fit: cover;">` : `<div class="avatar ${avatarClass}">${fallbackInitials}</div>`}
+          <h3 style="margin-top: 12px; font-size: 18px;">${name}</h3>
+          <p class="role" style="font-size: 13px; margin-bottom: 12px;">${p.role || p.position || 'Academic Staff'}</p>
+          <div style="margin-top: auto;">
+            ${(p.research_areas || p.status_membership) ? `
+              <ul class="tags" style="margin-bottom: 10px; padding: 0; display: flex; flex-wrap: wrap; gap: 6px;">
+                ${p.research_areas ? `<li class="chip" style="font-size: 11px; padding: 4px 8px;">${p.research_areas}</li>` : ''}
+                ${p.status_membership ? `<li class="chip" style="font-size: 11px; padding: 4px 8px; background: #eef2f6; color: #444;">${p.status_membership}</li>` : ''}
+              </ul>
+            ` : ''}
+            ${p.bio ? `<p style="font-size: 13px; color: #555; line-height: 1.4; margin-bottom: 12px;">${p.bio}</p>` : ''}
+            <div class="socials" style="margin-top: 12px;">
+              ${p.email ? `<a href="mailto:${p.email}" class="social" title="Email"><i data-icon="mail" data-size="14"></i></a>` : ''}
+              ${p.linkedin_url ? `<a href="${p.linkedin_url}" target="_blank" class="social" title="LinkedIn"><i data-icon="linkedin" data-size="14"></i></a>` : ''}
+              ${p.google_scholar ? `<a href="${p.google_scholar}" target="_blank" class="social" title="Google Scholar" style="font-size: 14px; text-decoration: none;">🎓</a>` : ''}
+            </div>
+            ${(p.orcid_id || p.ciencia_id) ? `
+              <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid #eee; font-size: 11px; color: #888;">
+                ${p.orcid_id ? `<div style="margin-bottom: 2px;">ORCID: <strong style="color: #666;">${p.orcid_id}</strong></div>` : ''}
+                ${p.ciencia_id ? `<div>Ciência ID: <strong style="color: #666;">${p.ciencia_id}</strong></div>` : ''}
+              </div>
+            ` : ''}
           </div>
         </li>`;
     }).join("");
+    renderIcons();
   }
 
+  // 2. EXTENDED PROJECTS GRID
   async function populateProjects() {
     const target = document.querySelector(".grid-projects");
     if (!target) return;
-
-    const projects = await requestJson("/api/projects", []);
-    target.innerHTML = projects.map((project, index) => `
-      <li class="card project">
-        <a href="#">
-          <div class="cover p${(index % 4) + 1}"><span class="tag">${project.category || "Research"}</span></div>
-          <div class="body">
-            <div>
-              <h3>${project.title || "Project"}</h3>
-              <p>${project.summary || "Applied research project"}</p>
+    target.style.alignItems = "flex-start";
+    const projects = await requestJson("/projects", []);
+    target.innerHTML = projects.map((p, idx) => {
+      const inlineBanner = p.image_url ? `style="background-image:url('${p.image_url}'); background-size:cover; background-position:center;"` : '';
+      return `
+        <li class="card project">
+          <a href="#" style="display: flex; flex-direction: column;">
+            <div class="cover p${(idx % 4) + 1}" ${inlineBanner}><span class="tag" style="font-size: 11px;">${p.category || "Research"}</span></div>
+            <div class="body" style="padding: 16px; display: flex; flex-direction: column;">
+              <div>
+                <h3 style="font-size: 18px; margin-bottom: 6px;">${p.title}</h3>
+                ${p.summary ? `<p style="font-size: 13px; line-height: 1.4;">${p.summary}</p>` : ''}
+                ${(p.funding_entity || p.principal_investigator) ? `
+                  <div style="margin-top: 12px; font-size: 12px; color: #666;">
+                    ${p.funding_entity ? `<div style="margin-bottom: 2px;"><strong>Funding:</strong> ${p.funding_entity} ${p.budget ? `(€${p.budget})` : ''}</div>` : ''}
+                    ${p.principal_investigator ? `<div><strong>PI:</strong> ${p.principal_investigator}</div>` : ''}
+                  </div>
+                ` : ''}
+              </div>
+              <span class="arrow" style="margin-top: 16px; align-self: flex-end;"><i data-icon="arrow-ur" data-size="14"></i></span>
             </div>
-            <span class="arrow"><i data-icon="arrow-ur" data-size="16"></i></span>
-          </div>
-        </a>
-      </li>`).join("");
+          </a>
+        </li>`;
+    }).join("");
+    renderIcons();
   }
 
-  async function populateResources() {
-    const target = document.querySelector(".grid-res");
+  // 3. EXTENDED EVENTS SPLIT-RENDER
+  async function populateEvents() {
+    const target = document.getElementById("events-list");
     if (!target) return;
+    const events = await requestJson("/events", []);
+    const now = new Date();
+    now.setHours(0,0,0,0); 
 
-    const resources = await requestJson("/api/resources", []);
-    target.innerHTML = resources.map((resource) => `
-      <li>
-        <a href="${resource.link || "#"}" class="res" target="_blank" rel="noreferrer">
-          <div class="ico"><i data-icon="file" data-size="20"></i></div>
-          <div class="body">
-            <h3>${resource.name || "Resource"}</h3>
-            <small>${resource.category || "Resource"}</small>
-          </div>
-          <span class="dl" aria-label="Open"><i data-icon="download" data-size="16"></i></span>
-        </a>
-      </li>`).join("");
+    const upcoming = [];
+    const past = [];
+
+    events.forEach(e => {
+      const eDate = e.event_date ? new Date(e.event_date) : now;
+      if(eDate >= now) upcoming.push(e);
+      else past.push(e);
+    });
+
+    function renderBlock(arr, title) {
+      if(arr.length === 0) return `<p style="color:#666; font-size: 14px; font-style:italic; margin-bottom:40px;">No events listed.</p>`;
+      return `
+        <h3 style="margin: 30px 0 16px 0; color: #0B3C6D; font-size: 22px; border-bottom: 2px solid #eee; padding-bottom: 8px;">${title}</h3>
+        <ul class="grid-projects" style="margin-bottom: 40px; align-items: flex-start;">
+          ${arr.map((e, idx) => {
+            const dateStr = e.event_date ? new Date(e.event_date).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : 'TBA';
+            const timeStr = e.start_time ? ` &bull; ${e.start_time.substring(0,5)}` : '';
+            const inlineBanner = e.image_url ? `style="background-image:url('${e.image_url}'); background-size:cover; background-position:center;"` : '';
+            return `
+              <li class="card project" style="cursor: default;">
+                <div style="display: flex; flex-direction: column;">
+                  <div class="cover p${(idx % 4) + 1}" ${inlineBanner}>
+                    <span class="tag" style="font-size: 11px;">${e.category || 'Event'}</span>
+                  </div>
+                  <div class="body" style="padding: 16px; display: flex; flex-direction: column;">
+                    <div style="margin-bottom: 10px; font-size: 12px; font-weight: 600; color: #1CA9C9;">
+                      <i data-icon="calendar" data-size="12" style="vertical-align: middle; margin-right: 4px;"></i>
+                      ${dateStr}${timeStr}
+                    </div>
+                    <h3 style="margin-bottom: 6px; font-size: 18px;">${e.title || 'Untitled Event'}</h3>
+                    ${e.description ? `<p style="margin-bottom: 12px; font-size: 13px; line-height: 1.4;">${e.description}</p>` : ''}
+                    ${(e.venue || e.speaker) ? `
+                      <div style="font-size: 12px; color: #555; margin-bottom: 16px;">
+                        ${e.venue ? `<div style="margin-bottom: 4px;">📍 <strong>Venue:</strong> ${e.venue}</div>` : ''}
+                        ${e.speaker ? `<div>🗣️ <strong>Speaker:</strong> ${e.speaker}</div>` : ''}
+                      </div>
+                    ` : '<div style="margin-bottom: 16px;"></div>'}
+                    ${e.registration_link ? `
+                    <div style="margin-top: 8px; padding-top: 12px; border-top: 1px solid #eee;">
+                      <a href="${e.registration_link}" target="_blank" class="btn btn-solid" style="display: inline-flex; align-items: center; padding: 8px 16px; font-size: 12px;">
+                        Register <i data-icon="arrow" data-size="12" style="margin-left: 6px;"></i>
+                      </a>
+                    </div>
+                    ` : ''}
+                  </div>
+                </div>
+              </li>`;
+          }).join('')}
+        </ul>`;
+    }
+
+    target.innerHTML = renderBlock(upcoming, "Upcoming Events") + renderBlock(past, "Past Events");
+    renderIcons();
   }
 
-  async function populatePublications(translationSet) {
-    const target = document.getElementById("pub-list");
-    if (!target) return;
+  // ==========================================
+  // CORE ICONS
+  // ==========================================
+  const ICONS = {
+    search: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
+    menu: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>',
+    close: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
+    arrow: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>',
+    "arrow-ur": '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>',
+    linkedin: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>',
+    twitter: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>',
+    github: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>',
+    map: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
+    mail: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>',
+    phone: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+    file: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>',
+    brain: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 0 7 4.5v15a2.5 2.5 0 0 0 5 0V18h3.5a2.5 2.5 0 0 0 0-5H12v-2h1.5a2.5 2.5 0 0 0 0-5H12V4.5A2.5 2.5 0 0 0 9.5 2z"/></svg>',
+    network: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3"/><path d="M12 8v3"/></svg>',
+    cpu: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>',
+    shield: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+    calendar: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>'
+  };
 
-    const publications = await requestJson("/api/publications", []);
-    const readLabel = translationSet?.sections?.publications?.read || "Read paper";
-    target.innerHTML = publications.map((publication, index) => `
-      <li class="pub" data-cat="${publication.type || "Research"}" data-title="${publication.title || "Publication"}">
-        <span class="dot"></span>
-        <a href="#" class="pub-card">
-          <div class="pub-meta">
-            <div>
-              <span class="year">${publication.year || new Date().getFullYear()}</span>
-              <span class="cat">${publication.type || "Research"}</span>
-            </div>
-            <div>
-              <h3>${publication.title || "Publication"}</h3>
-              <small>${publication.type || "Research"}</small>
-            </div>
-          </div>
-          <span class="pub-read">${readLabel} <i data-icon="arrow-ur" data-size="16"></i></span>
-        </a>
-      </li>`).join("");
-
-    setupPublicationFilters();
+  window.__icon = (name, size = 20) => (ICONS[name] || "").replace(/\{s\}/g, size);
+  function renderIcons() {
+    document.querySelectorAll("[data-icon]").forEach((el) => { el.innerHTML = window.__icon(el.dataset.icon, el.dataset.size || 20); });
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    initializeLanguageToggles();
-    applyI18n();
-    setupMobileNavigation();
-    setupScrollProgress();
-    const revealObserver = setupRevealAnimations();
-    setupCounterAnimations();
-    createHeroParticles();
-    setupResearchPage(revealObserver);
-    setupHomeResearch(revealObserver);
-    setupForms();
-
-    populateDashboardStats();
-    populateResearchers();
-    populateProjects();
-    populateResources();
-    populatePublications(window.__t());
-  });
-
-  function initializeLanguageToggles() {
-    document.querySelectorAll(".lang-toggle").forEach((button) => {
-      button.addEventListener("click", () => window.__setLang(lang === "en" ? "pt" : "en"));
+  // ==========================================
+  // UI & NAVIGATION ANIMATIONS
+  // ==========================================
+  
+  // ---> THIS IS THE MISSING TRANSLATION TOGGLE EVENT <---
+  function setupLanguageToggle() {
+    document.querySelectorAll(".lang-toggle").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const currentLang = window.__getLang();
+        window.__setLang(currentLang === "en" ? "pt" : "en");
+      });
     });
   }
 
@@ -349,7 +383,6 @@
     const toggleButton = document.querySelector(".mobile-toggle");
     const mobileNav = document.getElementById("mobile-nav");
     if (!toggleButton || !mobileNav) return;
-
     toggleButton.addEventListener("click", () => {
       const isOpen = mobileNav.classList.toggle("open");
       toggleButton.setAttribute("aria-expanded", String(isOpen));
@@ -361,7 +394,6 @@
   function setupScrollProgress() {
     const header = document.querySelector(".header");
     const progressBar = document.querySelector(".progress");
-
     const updateScrollState = () => {
       if (header) header.classList.toggle("scrolled", window.scrollY > 24);
       if (progressBar) {
@@ -370,7 +402,6 @@
         progressBar.style.transform = `scaleX(${progressRatio})`;
       }
     };
-
     updateScrollState();
     window.addEventListener("scroll", updateScrollState, { passive: true });
   }
@@ -384,7 +415,6 @@
         }
       });
     }, { threshold: 0.12, rootMargin: "-40px 0px" });
-
     document.querySelectorAll(".reveal, .reveal-stagger").forEach((element) => observer.observe(element));
     return observer;
   }
@@ -393,32 +423,27 @@
     const counterObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
-
         const element = entry.target;
         const targetValue = parseInt(element.dataset.to, 10);
         const suffix = element.dataset.suffix || "";
         const startTime = performance.now();
         const duration = 1600;
         const easeOutCubic = (progress) => 1 - Math.pow(1 - progress, 3);
-
         function updateCounter(now) {
           const progress = Math.min(1, (now - startTime) / duration);
           element.textContent = Math.round(targetValue * easeOutCubic(progress)).toLocaleString() + suffix;
           if (progress < 1) requestAnimationFrame(updateCounter);
         }
-
         requestAnimationFrame(updateCounter);
         counterObserver.unobserve(element);
       });
     }, { threshold: 0.4 });
-
     document.querySelectorAll("[data-counter]").forEach((element) => counterObserver.observe(element));
   }
 
   function createHeroParticles() {
     const particlesContainer = document.querySelector(".hero-particles");
     if (!particlesContainer) return;
-
     for (let index = 0; index < 22; index += 1) {
       const particle = document.createElement("span");
       const size = 2 + ((index * 37) % 5);
@@ -432,43 +457,15 @@
     }
   }
 
-  function setupPublicationFilters() {
-    const publicationList = document.getElementById("pub-list");
-    if (!publicationList) return;
-
-    const categoryButtons = document.querySelectorAll(".cat-btn");
-    const searchInput = document.getElementById("pub-search-input");
-    let activeCategory = "All";
-
-    const updatePublicationVisibility = () => {
-      const searchTerm = (searchInput?.value || "").toLowerCase();
-      publicationList.querySelectorAll(".pub").forEach((item) => {
-        const category = item.dataset.cat;
-        const title = item.dataset.title.toLowerCase();
-        const shouldShow = (activeCategory === "All" || category === activeCategory) && title.includes(searchTerm);
-        item.classList.toggle("hidden", !shouldShow);
-      });
-    };
-
-    categoryButtons.forEach((button) => button.addEventListener("click", () => {
-      activeCategory = button.dataset.cat;
-      categoryButtons.forEach((candidate) => candidate.classList.toggle("active", candidate === button));
-      updatePublicationVisibility();
-    }));
-
-    searchInput?.addEventListener("input", updatePublicationVisibility);
-  }
-
   function setupResearchPage(revealObserver) {
     const researchLinesContainer = document.getElementById("research-lines");
     if (!researchLinesContainer) return;
-
     window.renderResearch = (translationSet) => {
       const icons = ["brain", "network", "cpu", "shield"];
       researchLinesContainer.innerHTML = translationSet.research.lines.map((line, index) => `
         <li class="simple-area reveal">
           <div class="row">
-            <div class="ico">${window.__icon(icons[index], 28)}</div>
+            <div class="ico">${window.__icon(icons[index % icons.length], 28)}</div>
             <div>
               <h2>${line.title}</h2>
               <p>${line.description}</p>
@@ -479,20 +476,18 @@
         </li>`).join("");
       researchLinesContainer.querySelectorAll(".reveal").forEach((element) => revealObserver.observe(element));
     };
-
     window.renderResearch(window.__t());
   }
 
   function setupHomeResearch(revealObserver) {
     const homeResearchContainer = document.getElementById("home-research");
     if (!homeResearchContainer) return;
-
     const rebuildHomeResearch = (translationSet) => {
       const icons = ["brain", "network", "cpu", "shield"];
       homeResearchContainer.innerHTML = translationSet.research.lines.map((line, index) => `
         <li class="card area reveal">
           <div class="area-inner">
-            <div class="ico">${window.__icon(icons[index], 24)}</div>
+            <div class="ico">${window.__icon(icons[index % icons.length], 24)}</div>
             <div>
               <h3>${line.title}</h3>
               <p>${line.description}</p>
@@ -502,7 +497,6 @@
         </li>`).join("");
       homeResearchContainer.querySelectorAll(".reveal").forEach((element) => revealObserver.observe(element));
     };
-
     rebuildHomeResearch(window.__t());
     const originalSetLanguage = window.__setLang;
     window.__setLang = (languageCode) => {
@@ -511,99 +505,47 @@
     };
   }
 
-  function setupForms() {
-    document.querySelectorAll("form.contact-form").forEach((form) => {
-      form.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        const statusMessage = form.querySelector(".sent");
-        const submitButton = form.querySelector("button[type='submit']");
+  async function populateDashboardStatsDynamic() {
+    const values = { researchers: 0, projects: 0, publications: 180, events: 0 };
+    const [res, proj, ev] = await Promise.all([
+      requestJson("/researchers", []),
+      requestJson("/projects", []),
+      requestJson("/events", [])
+    ]);
 
-        if (statusMessage) {
-          statusMessage.textContent = "";
-          statusMessage.hidden = true;
-        }
+    values.researchers = res.length || 40;
+    values.projects = proj.length || 25;
+    values.events = ev.length || 60;
 
-        if (submitButton) {
-          submitButton.disabled = true;
-          submitButton.textContent = "Sending…";
-        }
+    const counterElements = Array.from(document.querySelectorAll("[data-counter]"));
+    const numericValues = [values.researchers, values.projects, values.publications, values.events];
 
-        try {
-          const payload = {
-            name: document.getElementById("c-name")?.value || "",
-            email: document.getElementById("c-email")?.value || "",
-            subject: document.getElementById("c-subject")?.value || "",
-            message: document.getElementById("c-message")?.value || "",
-          };
-
-          const response = await fetch("/api/contact", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          });
-
-          const result = await response.json().catch(() => ({}));
-          if (!response.ok) throw new Error(result.message || "Unable to send message");
-
-          if (statusMessage) {
-            statusMessage.textContent = window.__t().contact.success;
-            statusMessage.hidden = false;
-          }
-          form.reset();
-        } catch (error) {
-          if (statusMessage) {
-            statusMessage.textContent = error.message || "The message could not be sent.";
-            statusMessage.hidden = false;
-          }
-        } finally {
-          if (submitButton) {
-            submitButton.disabled = false;
-            submitButton.innerHTML = `<span>${window.__t().contact.send}</span><i data-icon="arrow" data-size="16"></i>`;
-          }
-        }
-      });
-    });
-
-    document.querySelectorAll("form.newsletter-form").forEach((form) => {
-      form.addEventListener("submit", (event) => event.preventDefault());
+    counterElements.forEach((element, index) => {
+      const targetValue = Number(numericValues[index] || 0);
+      const suffix = element.dataset.suffix || "";
+      element.dataset.to = String(targetValue);
+      element.textContent = `${targetValue.toLocaleString()}${suffix}`;
     });
   }
 
-  // Icon helper
-  const ICONS = {
-    arrow: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>',
-    "arrow-ur": '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg>',
-    chevron: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
-    sparkles: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3zM19 14l.9 2.6L22 17.5l-2.1.9L19 21l-.9-2.6L16 17.5l2.1-.9L19 14zM5 15l.7 2.1L8 18l-2.3.9L5 21l-.7-2.1L2 18l2.3-.9L5 15z"/></svg>',
-    users: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
-    rocket: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09zM12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2zM9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>',
-    book: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15z"/></svg>',
-    flask: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.5L4.5 20A2 2 0 0 0 6.2 23h11.6a2 2 0 0 0 1.7-3L14 9.5V2M8 2h8M7 15h10"/></svg>',
-    brain: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3 3 3 0 0 0-3 3 3 3 0 0 0-2 5.24A3 3 0 0 0 6 19a3 3 0 0 0 3 3 3 3 0 0 0 3-3V2zM12 2a3 3 0 0 1 3 3 3 3 0 0 1 3 3 3 3 0 0 1 2 5.24A3 3 0 0 1 18 19a3 3 0 0 1-3 3 3 3 0 0 1-3-3V2z"/></svg>',
-    network: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="6" rx="1"/><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><path d="M5 16v-3h14v3M12 12V8"/></svg>',
-    cpu: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></svg>',
-    shield: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>',
-    mail: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6L12 13 2 6"/></svg>',
-    map: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
-    phone: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.97.37 1.92.72 2.82a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.26-1.26a2 2 0 0 1 2.11-.45c.9.35 1.85.6 2.82.72A2 2 0 0 1 22 16.92z"/></svg>',
-    search: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>',
-    menu: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>',
-    close: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>',
-    download: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>',
-    file: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>',
-    database: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>',
-    code: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>',
-    bookmark: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>',
-    linkedin: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>',
-    twitter: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg>',
-    github: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>',
-  };
-  window.__icon = (name, size = 20) => (ICONS[name] || "").replace(/\{s\}/g, size);
-
-  // Inject icons declared as <i data-icon="name" data-size="20"></i>
   document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll("[data-icon]").forEach((el) => {
-      el.innerHTML = window.__icon(el.dataset.icon, el.dataset.size || 20);
-    });
+    applyI18n();
+    renderIcons();
+    
+    setupLanguageToggle(); // <--- FIXED! The EN/PT button now works again!
+    
+    setupMobileNavigation();
+    setupScrollProgress();
+    const revealObserver = setupRevealAnimations();
+    setupCounterAnimations();
+    createHeroParticles();
+    setupResearchPage(revealObserver);
+    setupHomeResearch(revealObserver);
+
+    populateDashboardStatsDynamic();
+    populateResearchers();
+    populateProjects();
+    populateEvents();
   });
+
 })();
