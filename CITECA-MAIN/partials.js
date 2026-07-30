@@ -55,9 +55,19 @@
         <div class="foot-brand"><img src="assets/logo.png" alt="CITECA logo"><span>CITECA</span></div>
         <p class="foot-desc" data-i18n="footer.description"></p>
         <div class="foot-socials">
-          <a href="#" class="foot-social" aria-label="LinkedIn"><i data-icon="linkedin" data-size="16"></i></a>
-          <a href="#" class="foot-social" aria-label="Twitter"><i data-icon="twitter" data-size="16"></i></a>
-          <a href="#" class="foot-social" aria-label="GitHub"><i data-icon="github" data-size="16"></i></a>
+          <a href="https://istec-porto.pt/" class="foot-social" target="_blank" rel="noopener noreferrer" aria-label="ISTEC Porto website" title="ISTEC Porto website">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/istec.porto/" class="foot-social" target="_blank" rel="noopener noreferrer" aria-label="ISTEC Porto on Instagram" title="ISTEC Porto on Instagram">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </a>
+          <a href="https://pt.linkedin.com/school/istecporto/" class="foot-social" target="_blank" rel="noopener noreferrer" aria-label="ISTEC Porto on LinkedIn" title="ISTEC Porto on LinkedIn"><i data-icon="linkedin" data-size="16"></i></a>
+          <a href="https://www.facebook.com/istecportoficial/" class="foot-social" target="_blank" rel="noopener noreferrer" aria-label="ISTEC Porto on Facebook" title="ISTEC Porto on Facebook">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.51 1.5-3.9 3.79-3.9 1.1 0 2.25.2 2.25.2v2.47h-1.27c-1.25 0-1.64.78-1.64 1.57V12h2.79l-.45 2.89h-2.34v6.99A10 10 0 0 0 22 12z"/></svg>
+          </a>
+          <a href="https://www.youtube.com/channel/UCPgK2GGR49_n0-alrNOG1vw" class="foot-social" target="_blank" rel="noopener noreferrer" aria-label="ISTEC Porto on YouTube" title="ISTEC Porto on YouTube">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg>
+          </a>
         </div>
       </div>
       <nav class="foot" aria-label="Quick links">
