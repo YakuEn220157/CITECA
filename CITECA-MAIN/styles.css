@@ -32,13 +32,13 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 .header.scrolled{background:rgba(255,255,255,.8);backdrop-filter:blur(20px);border-bottom-color:rgba(229,231,235,.7);box-shadow:0 1px 0 rgba(11,60,109,.04)}
 .header-inner{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:24px;height:80px;transition:height .3s var(--ease)}
 .header.scrolled .header-inner{height:64px}
-.brand{display:flex;align-items:center;gap:12px}
-.brand-mark{display:grid;place-items:center;background:#fff;border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.05);
-  height:40px;width:40px;padding:6px;transition:all .3s var(--ease);ring:1px solid rgba(0,0,0,.05)}
-.header.scrolled .brand-mark{height:36px;width:36px}
-.brand-mark img{height:100%;width:auto}
+.brand{display:flex;align-items:center;gap:14px}
+.brand-mark{display:block;width:96px;height:42px;padding:0;background:transparent;border-radius:0;box-shadow:none;overflow:hidden;transition:all .3s var(--ease)}
+.header.scrolled .brand-mark{width:84px;height:36px}
+.brand-mark img{display:block;width:100%;height:100%;object-fit:contain;object-position:left center}
 .brand-name{display:none;font-weight:600;font-size:15px;letter-spacing:-.01em;color:var(--primary)}
 @media(min-width:640px){.brand-name{display:inline}}
+@media(max-width:639px){.brand-mark{width:78px;height:36px}}
 .nav-primary{display:none;justify-content:center}
 @media(min-width:768px){.nav-primary{display:flex}}
 .nav-primary ul{display:flex;align-items:center;gap:4px}
