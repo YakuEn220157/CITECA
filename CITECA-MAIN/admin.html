@@ -25,7 +25,7 @@
     .btn:hover { background: var(--accent); }
     .btn-danger { background: var(--danger); padding: 8px 14px; font-size: 13px; }
     .btn-danger:hover { background: #c0392b; }
-    .btn-warning { background: var(--warning); padding: 8px 14px; font-size: 13px; margin-right: 8px; }
+    .btn-warning { background: var(--warning); padding: 8px 14px; font-size: 13px; margin-right: 8px; color: white;}
     .btn-warning:hover { background: #d68910; }
     .btn-secondary { background: #95a5a6; }
     .btn-secondary:hover { background: #7f8c8d; }
@@ -142,7 +142,6 @@
     let DB = { events: [], researchers: [], projects: [] };
     let editMode = { events: null, researchers: null, projects: null };
 
-    // UTILITIES
     function notify(msg, type='success') {
       const el = document.createElement('div'); el.className = `toast ${type}`; el.textContent = msg;
       document.getElementById('toast-view').appendChild(el); setTimeout(() => el.remove(), 4000);
@@ -196,9 +195,8 @@
       return fetch(url, { method, headers, body: payload ? JSON.stringify(payload) : null });
     }
 
-    // LOAD DATA
     async function fetchAllRecords() {
-      // Fetch & Store Events
+      // Fetch Events
       const resEv = await securedRequest(`${API_URL}/events`);
       if(resEv.ok) {
         DB.events = await resEv.json();
@@ -212,7 +210,7 @@
           </div>`).join('');
       }
 
-      // Fetch & Store Researchers
+      // Fetch Researchers
       const resRes = await securedRequest(`${API_URL}/researchers`);
       if(resRes.ok) {
         DB.researchers = await resRes.json();
@@ -226,7 +224,7 @@
           </div>`).join('');
       }
 
-      // Fetch & Store Projects
+      // Fetch Projects
       const resProj = await securedRequest(`${API_URL}/projects`);
       if(resProj.ok) {
         DB.projects = await resProj.json();
@@ -241,14 +239,13 @@
       }
     }
 
-    // DELETE LOGIC
     async function executeRemoval(endpoint, id) {
-      if(!confirm('Permanently delete this record?')) return;
+      if(!confirm('Are you sure you want to permanently delete this record?')) return;
       const res = await securedRequest(`${API_URL}/${endpoint}/${id}`, 'DELETE');
-      if(res.ok) { notify('Record erased.'); fetchAllRecords(); } else { notify('Deletion failed.', 'error'); }
+      if(res.ok) { notify('Record erased successfully.'); fetchAllRecords(); }
+      else { notify('Deletion failed.', 'error'); }
     }
 
-    // EDIT UI STATE LOGIC
     function startEdit(type, id) {
       editMode[type] = id;
       const item = DB[type].find(i => i.id === id);
@@ -298,28 +295,16 @@
         document.getElementById('btn-submit-projects').textContent = 'Update Project';
         document.getElementById('btn-cancel-projects').style.display = 'inline-block';
       }
-      window.scrollTo(0, 0); // Jump back to top where form is
-      notify(`Editing mode active.`);
+      window.scrollTo(0, 0); notify(`Editing mode active.`);
     }
 
     function cancelEdit(type) {
       editMode[type] = null;
-      if (type === 'events') {
-        document.getElementById('form-extended-event').reset();
-        document.getElementById('btn-submit-events').textContent = 'Save New Event';
-        document.getElementById('btn-cancel-events').style.display = 'none';
-      } else if (type === 'researchers') {
-        document.getElementById('form-extended-researcher').reset();
-        document.getElementById('btn-submit-researchers').textContent = 'Save New Profile';
-        document.getElementById('btn-cancel-researchers').style.display = 'none';
-      } else if (type === 'projects') {
-        document.getElementById('form-extended-project').reset();
-        document.getElementById('btn-submit-projects').textContent = 'Save New Project';
-        document.getElementById('btn-cancel-projects').style.display = 'none';
-      }
+      document.getElementById(`form-extended-${type === 'researchers' ? 'researcher' : type === 'projects' ? 'project' : 'event'}`).reset();
+      document.getElementById(`btn-submit-${type}`).textContent = type === 'events' ? 'Save New Event' : (type === 'projects' ? 'Save New Project' : 'Save New Profile');
+      document.getElementById(`btn-cancel-${type}`).style.display = 'none';
     }
 
-    // SUBMISSION LOGIC (Smart: Creates or Updates)
     document.getElementById('form-extended-event').onsubmit = async (e) => {
       e.preventDefault();
       const payload = {
@@ -330,16 +315,9 @@
         registration_link: document.getElementById('ev-reg').value, image_url: document.getElementById('ev-img').value,
         description: document.getElementById('ev-desc').value
       };
-      
-      const isUpdating = editMode.events !== null;
-      const endpoint = isUpdating ? `${API_URL}/events/${editMode.events}` : `${API_URL}/events`;
-      const method = isUpdating ? 'PUT' : 'POST';
-
-      const res = await securedRequest(endpoint, method, payload);
-      if(res.ok) { 
-        notify(`Event ${isUpdating ? 'updated' : 'saved'} successfully.`); 
-        cancelEdit('events'); fetchAllRecords(); 
-      } else { notify('Failed to save data.', 'error'); }
+      const isUp = editMode.events !== null;
+      const res = await securedRequest(isUp ? `${API_URL}/events/${editMode.events}` : `${API_URL}/events`, isUp ? 'PUT' : 'POST', payload);
+      if(res.ok) { notify('Event saved.'); cancelEdit('events'); fetchAllRecords(); } else { notify('Failed.', 'error'); }
     };
 
     document.getElementById('form-extended-researcher').onsubmit = async (e) => {
@@ -353,16 +331,9 @@
         research_areas: document.getElementById('res-areas').value, expertise: document.getElementById('res-areas').value,
         status_membership: document.getElementById('res-status').value, bio: document.getElementById('res-bio').value
       };
-
-      const isUpdating = editMode.researchers !== null;
-      const endpoint = isUpdating ? `${API_URL}/researchers/${editMode.researchers}` : `${API_URL}/researchers`;
-      const method = isUpdating ? 'PUT' : 'POST';
-
-      const res = await securedRequest(endpoint, method, payload);
-      if(res.ok) { 
-        notify(`Profile ${isUpdating ? 'updated' : 'saved'} successfully.`); 
-        cancelEdit('researchers'); fetchAllRecords(); 
-      } else { notify('Failed to save data.', 'error'); }
+      const isUp = editMode.researchers !== null;
+      const res = await securedRequest(isUp ? `${API_URL}/researchers/${editMode.researchers}` : `${API_URL}/researchers`, isUp ? 'PUT' : 'POST', payload);
+      if(res.ok) { notify('Profile saved.'); cancelEdit('researchers'); fetchAllRecords(); } else { notify('Failed.', 'error'); }
     };
 
     document.getElementById('form-extended-project').onsubmit = async (e) => {
@@ -374,16 +345,9 @@
         principal_investigator: document.getElementById('proj-pi').value, image_url: document.getElementById('proj-img').value,
         partners: document.getElementById('proj-partners').value, summary: document.getElementById('proj-summary').value
       };
-
-      const isUpdating = editMode.projects !== null;
-      const endpoint = isUpdating ? `${API_URL}/projects/${editMode.projects}` : `${API_URL}/projects`;
-      const method = isUpdating ? 'PUT' : 'POST';
-
-      const res = await securedRequest(endpoint, method, payload);
-      if(res.ok) { 
-        notify(`Project ${isUpdating ? 'updated' : 'saved'} successfully.`); 
-        cancelEdit('projects'); fetchAllRecords(); 
-      } else { notify('Failed to save data.', 'error'); }
+      const isUp = editMode.projects !== null;
+      const res = await securedRequest(isUp ? `${API_URL}/projects/${editMode.projects}` : `${API_URL}/projects`, isUp ? 'PUT' : 'POST', payload);
+      if(res.ok) { notify('Project saved.'); cancelEdit('projects'); fetchAllRecords(); } else { notify('Failed.', 'error'); }
     };
 
     checkAuthenticationState();

@@ -18,6 +18,8 @@ app.use('/api/auth', auth.router); // Mount the login route
 app.use('/api/events', require('./routes/events'));
 app.use('/api/researchers', require('./routes/researchers'));
 app.use('/api/projects', require('./routes/projects'));
+app.use("/api/tags", require("./routes/tags"));
+app.use("/api/areas", require("./routes/areas")); // Changed from tags to areas
 
 // Fallback for SPA or direct index access
 app.get('/', (req, res) => {
