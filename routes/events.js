@@ -12,18 +12,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/:id", async (req, res) => {
-  try {
-    const rows = await db.query("SELECT * FROM events WHERE id = ?", [req.params.id]);
-    if (!rows || rows.length === 0) {
-      return res.status(404).json({ ok: false, message: "Event not found." });
-    }
-    res.json({ ok: true, event: rows[0] });
-  } catch (error) {
-    res.status(500).json({ ok: false, message: error.message });
-  }
-});
-
 router.post("/", verifyToken, async (req, res) => {
   try {
     const d = req.body;

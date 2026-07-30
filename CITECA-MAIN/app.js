@@ -253,7 +253,7 @@
       const inlineBanner = p.image_url ? `style="background-image:url('${p.image_url}'); background-size:cover; background-position:center;"` : '';
       return `
         <li class="card project">
-          <a href="project.html?id=${p.id}" style="display: flex; flex-direction: column; text-decoration: none; color: inherit;">
+          <a href="#" style="display: flex; flex-direction: column;">
             <div class="cover p${(idx % 4) + 1}" ${inlineBanner}><span class="tag" style="font-size: 11px;">${p.category || "Research"}</span></div>
             <div class="body" style="padding: 16px; display: flex; flex-direction: column;">
               <div>
@@ -301,167 +301,39 @@
             const timeStr = e.start_time ? ` &bull; ${e.start_time.substring(0,5)}` : '';
             const inlineBanner = e.image_url ? `style="background-image:url('${e.image_url}'); background-size:cover; background-position:center;"` : '';
             return `
-              <li class="card project" style="cursor: pointer;">
-                <a href="event.html?id=${e.id}" style="display: flex; flex-direction: column; text-decoration: none; color: inherit;">
-                  <div style="display: flex; flex-direction: column;">
-                    <div class="cover p${(idx % 4) + 1}" ${inlineBanner}>
-                      <span class="tag" style="font-size: 11px;">${e.category || 'Event'}</span>
-                    </div>
-                    <div class="body" style="padding: 16px; display: flex; flex-direction: column;">
-                      <div style="margin-bottom: 10px; font-size: 12px; font-weight: 600; color: #1CA9C9;">
-                        <i data-icon="calendar" data-size="12" style="vertical-align: middle; margin-right: 4px;"></i>
-                        ${dateStr}${timeStr}
-                      </div>
-                      <h3 style="margin-bottom: 6px; font-size: 18px;">${e.title || 'Untitled Event'}</h3>
-                      ${e.description ? `<p style="margin-bottom: 12px; font-size: 13px; line-height: 1.4;">${e.description}</p>` : ''}
-                      ${(e.venue || e.speaker) ? `
-                        <div style="font-size: 12px; color: #555; margin-bottom: 16px;">
-                          ${e.venue ? `<div style="margin-bottom: 4px;">📍 <strong>Venue:</strong> ${e.venue}</div>` : ''}
-                          ${e.speaker ? `<div>🗣️ <strong>Speaker:</strong> ${e.speaker}</div>` : ''}
-                        </div>
-                      ` : '<div style="margin-bottom: 16px;"></div>'}
-                      ${e.registration_link ? `
-                      <div style="margin-top: 8px; padding-top: 12px; border-top: 1px solid #eee;">
-                        <a href="${e.registration_link}" target="_blank" class="btn btn-solid" style="display: inline-flex; align-items: center; padding: 8px 16px; font-size: 12px;">
-                          Register <i data-icon="arrow" data-size="12" style="margin-left: 6px;"></i>
-                        </a>
-                      </div>
-                      ` : ''}
-                    </div>
+              <li class="card project" style="cursor: default;">
+                <div style="display: flex; flex-direction: column;">
+                  <div class="cover p${(idx % 4) + 1}" ${inlineBanner}>
+                    <span class="tag" style="font-size: 11px;">${e.category || 'Event'}</span>
                   </div>
-                </a>
+                  <div class="body" style="padding: 16px; display: flex; flex-direction: column;">
+                    <div style="margin-bottom: 10px; font-size: 12px; font-weight: 600; color: #1CA9C9;">
+                      <i data-icon="calendar" data-size="12" style="vertical-align: middle; margin-right: 4px;"></i>
+                      ${dateStr}${timeStr}
+                    </div>
+                    <h3 style="margin-bottom: 6px; font-size: 18px;">${e.title || 'Untitled Event'}</h3>
+                    ${e.description ? `<p style="margin-bottom: 12px; font-size: 13px; line-height: 1.4;">${e.description}</p>` : ''}
+                    ${(e.venue || e.speaker) ? `
+                      <div style="font-size: 12px; color: #555; margin-bottom: 16px;">
+                        ${e.venue ? `<div style="margin-bottom: 4px;">📍 <strong>Venue:</strong> ${e.venue}</div>` : ''}
+                        ${e.speaker ? `<div>🗣️ <strong>Speaker:</strong> ${e.speaker}</div>` : ''}
+                      </div>
+                    ` : '<div style="margin-bottom: 16px;"></div>'}
+                    ${e.registration_link ? `
+                    <div style="margin-top: 8px; padding-top: 12px; border-top: 1px solid #eee;">
+                      <a href="${e.registration_link}" target="_blank" class="btn btn-solid" style="display: inline-flex; align-items: center; padding: 8px 16px; font-size: 12px;">
+                        Register <i data-icon="arrow" data-size="12" style="margin-left: 6px;"></i>
+                      </a>
+                    </div>
+                    ` : ''}
+                  </div>
+                </div>
               </li>`;
           }).join('')}
         </ul>`;
     }
 
     target.innerHTML = renderBlock(upcoming, "Upcoming Events") + renderBlock(past, "Past Events");
-    renderIcons();
-  }
-
-  function getQueryParam(key) {
-    const params = new URLSearchParams(window.location.search);
-    return params.get(key);
-  }
-
-  async function renderProjectDetail() {
-    const container = document.getElementById("project-detail");
-    if (!container) return;
-
-    const projectId = getQueryParam("id");
-    if (!projectId) {
-      container.innerHTML = `<p style="color:#666; font-size:16px;">Invalid project ID.</p>`;
-      return;
-    }
-
-    const response = await requestJson(`/projects/${projectId}`, null);
-    if (!response || response.ok === false) {
-      container.innerHTML = `<p style="color:#666; font-size:16px;">Project not found.</p>`;
-      return;
-    }
-
-    const project = response.project;
-    const researchers = response.researchers || [];
-    const projectDate = project.start_date || project.end_date ? `${project.start_date || 'Start TBD'} — ${project.end_date || 'End TBD'}` : '';
-    const partnerList = project.partners ? project.partners.split(/[,;]+/).map((item) => item.trim()).filter(Boolean) : [];
-
-    container.innerHTML = `
-      <section class="page-hero detail-hero" style="padding:80px 24px;">
-        <div class="inner">
-          <p class="eb">${project.category || 'Project'}</p>
-          <h1>${project.title}</h1>
-          ${project.summary ? `<p style="max-width:760px; margin-top:18px;">${project.summary}</p>` : ''}
-        </div>
-      </section>
-      <section class="container" style="padding:40px 24px; max-width:1160px;">
-        <div class="detail-grid">
-          <article class="card" style="padding:32px;">
-            <h2 style="margin-bottom:18px;">Project overview</h2>
-            ${project.detailed_description ? `<p style="line-height:1.8; color:#444;">${project.detailed_description}</p>` : `<p style="line-height:1.8; color:#444;">${project.summary || 'No detailed description available.'}</p>`}
-            <div style="display:grid;gap:14px;margin-top:24px;">
-              ${project.funding_entity ? `<div><strong>Funding:</strong> ${project.funding_entity}${project.budget ? ` (€${project.budget})` : ''}</div>` : ''}
-              ${project.principal_investigator ? `<div><strong>Principal Investigator:</strong> ${project.principal_investigator}</div>` : ''}
-              ${project.contact_email ? `<div><strong>Contact:</strong> <a href="mailto:${project.contact_email}">${project.contact_email}</a></div>` : ''}
-              ${projectDate ? `<div><strong>Timeline:</strong> ${projectDate}</div>` : ''}
-              ${project.website_url ? `<div><strong>Website:</strong> <a href="${project.website_url}" target="_blank">${project.website_url}</a></div>` : ''}
-              ${project.documents_url ? `<div><strong>Documents:</strong> <a href="${project.documents_url}" target="_blank">${project.documents_url}</a></div>` : ''}
-            </div>
-          </article>
-
-          <aside class="card" style="padding:32px;">
-            <h2 style="margin-bottom:18px;">Project details</h2>
-            <dl class="detail-list">
-              ${project.status ? `<div><dt>Status</dt><dd>${project.status}</dd></div>` : ''}
-              ${project.category ? `<div><dt>Category</dt><dd>${project.category}</dd></div>` : ''}
-              ${project.research_areas ? `<div><dt>Research areas</dt><dd>${project.research_areas}</dd></div>` : ''}
-              ${project.outcomes ? `<div><dt>Outcomes</dt><dd>${project.outcomes}</dd></div>` : ''}
-              ${partnerList.length ? `<div><dt>Partners</dt><dd>${partnerList.join(', ')}</dd></div>` : ''}
-            </dl>
-          </aside>
-        </div>
-
-        <section style="margin-top:40px;">
-          <h2>Researchers on this project</h2>
-          <ul class="grid-people" style="margin-top:24px;">
-            ${researchers.length > 0 ? researchers.map((r, index) => `
-              <li class="person">
-                ${r.image_url ? `<img src="${r.image_url}" alt="${r.full_name || r.name}" class="avatar">` : `<div class="avatar h${(index % 4) + 1}">${(r.full_name || r.name || 'Researcher').split(' ').map((part) => part[0]).join('').slice(0,2).toUpperCase()}</div>`}
-                <h3 style="margin-top:18px;">${r.full_name || r.name}</h3>
-                <p style="margin-top:8px; color:#666; font-size:14px;">${r.position || r.role || ''}</p>
-                ${r.research_areas ? `<p style="margin-top:12px; color:#555; font-size:14px; line-height:1.5;">${r.research_areas}</p>` : ''}
-              </li>
-            `).join('') : `<p style="color:#666; font-size:15px;">No researchers are linked to this project yet.</p>`}
-          </ul>
-        </section>
-      </section>`;
-
-    renderIcons();
-  }
-
-  async function renderEventDetail() {
-    const container = document.getElementById("event-detail");
-    if (!container) return;
-
-    const eventId = getQueryParam("id");
-    if (!eventId) {
-      container.innerHTML = `<p style="color:#666; font-size:16px;">Invalid event ID.</p>`;
-      return;
-    }
-
-    const response = await requestJson(`/events/${eventId}`, null);
-    if (!response || response.ok === false) {
-      container.innerHTML = `<p style="color:#666; font-size:16px;">Event not found.</p>`;
-      return;
-    }
-
-    const event = response.event;
-    const eventDate = event.event_date ? new Date(event.event_date).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : 'TBA';
-    const timeInfo = event.start_time ? `${event.start_time}${event.end_time ? ` – ${event.end_time}` : ''}` : '';
-
-    container.innerHTML = `
-      <section class="page-hero detail-hero" style="padding:80px 24px;">
-        <div class="inner">
-          <p class="eb">${event.category || 'Event'}</p>
-          <h1>${event.title}</h1>
-          ${event.description ? `<p style="max-width:760px; margin-top:18px;">${event.description}</p>` : ''}
-        </div>
-      </section>
-      <section class="container" style="padding:40px 24px; max-width:960px;">
-        <div class="card detail-grid" style="padding:32px;">
-          <div>
-            <h2>Event details</h2>
-            <div style="display:grid;gap:16px;margin-top:24px;">
-              <div><strong>Date:</strong> ${eventDate}</div>
-              ${timeInfo ? `<div><strong>Time:</strong> ${timeInfo}</div>` : ''}
-              ${event.venue ? `<div><strong>Venue:</strong> ${event.venue}</div>` : ''}
-              ${event.speaker ? `<div><strong>Speaker:</strong> ${event.speaker}</div>` : ''}
-              ${event.registration_link ? `<div><strong>Registration:</strong> <a href="${event.registration_link}" target="_blank">${event.registration_link}</a></div>` : ''}
-              ${event.image_url ? `<div><img src="${event.image_url}" alt="${event.title}" style="width:100%;border-radius:18px;object-fit:cover;max-height:420px;margin-top:10px;"></div>` : ''}
-            </div>
-          </div>
-        </div>
-      </section>`;
-
     renderIcons();
   }
 
@@ -674,8 +546,6 @@
     populateResearchers();
     populateProjects();
     populateEvents();
-    renderProjectDetail();
-    renderEventDetail();
   });
 
 })();
