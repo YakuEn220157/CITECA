@@ -169,6 +169,12 @@ section.pad{padding:96px 0}
 .project .arrow{flex-shrink:0;display:grid;place-items:center;height:44px;width:44px;border-radius:9999px;border:1px solid var(--border);color:var(--primary);transition:all .3s}
 .project:hover .arrow{background:var(--primary);border-color:var(--primary);color:#fff}
 
+.detail-grid{display:grid;gap:32px}
+@media(min-width:900px){.detail-grid{grid-template-columns:2fr 1fr}}
+.detail-list{display:grid;gap:14px}
+.detail-list dt{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+.detail-list dd{margin:4px 0 0 0;font-size:15px;color:#1B1B1B}
+
 /* Publications */
 .pub-search{position:relative;flex:1}
 .pub-search svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}

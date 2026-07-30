@@ -73,12 +73,26 @@ INSERT INTO publications (title, year, type) VALUES
 ('Open Science in Practice', 2022, 'Book Chapter')
 ON DUPLICATE KEY UPDATE title = VALUES(title);
 
+CREATE TABLE IF NOT EXISTS project_researchers (
+  project_id INT NOT NULL,
+  researcher_id INT NOT NULL,
+  PRIMARY KEY(project_id, researcher_id),
+  FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
+  FOREIGN KEY (researcher_id) REFERENCES researchers(id) ON DELETE CASCADE
+);
+
 INSERT INTO events (title, date, venue) VALUES
 ('Open Research Day', '2025-10-05', 'Porto'),
 ('AI for Society Lab', '2025-11-12', 'Lisbon'),
 ('Innovation Meetup', '2026-01-20', 'Braga')
 ON DUPLICATE KEY UPDATE title = VALUES(title);
 
+INSERT IGNORE INTO project_researchers (project_id, researcher_id) VALUES
+(1, 1),
+(1, 3),
+(2, 2),
+(3, 4),
+(4, 1);
 INSERT INTO resources (name, category, link) VALUES
 ('Research Toolkit', 'Software', 'https://example.org/toolkit'),
 ('Data Governance Guide', 'Policy', 'https://example.org/governance'),
