@@ -127,9 +127,9 @@ section.pad{padding:96px 0}
 .bg-white{background:#fff}
 
 /* Stats */
-.grid-stats{margin-top:64px;display:grid;gap:24px;grid-template-columns:1fr}
+.grid-stats{margin:64px auto 0;display:grid;gap:24px;grid-template-columns:1fr;max-width:960px;justify-content:center}
 @media(min-width:640px){.grid-stats{grid-template-columns:repeat(2,1fr)}}
-@media(min-width:1024px){.grid-stats{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:1024px){.grid-stats{grid-template-columns:repeat(3,minmax(220px,280px));justify-content:center}}
 .card{position:relative;overflow:hidden;border-radius:24px;border:1px solid var(--border);background:#fff;box-shadow:var(--shadow-card);transition:transform .3s var(--ease),box-shadow .3s var(--ease)}
 .card:hover{transform:translateY(-6px);box-shadow:var(--shadow-hover)}
 .stat{padding:32px}
