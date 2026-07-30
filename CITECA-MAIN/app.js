@@ -686,19 +686,28 @@
   }
 
   async function populateDashboardStatsDynamic() {
-    const values = { researchers: 0, projects: 0, publications: 180, events: 0 };
+    const values = { researchers: 0, projects: 0, events: 0 };
     const [res, proj, ev] = await Promise.all([
       requestJson("/researchers", []),
       requestJson("/projects", []),
       requestJson("/events", [])
     ]);
 
-    values.researchers = res.length || 40;
-    values.projects = proj.length || 25;
-    values.events = ev.length || 60;
+    const toCount = (value) => {
+      if (Array.isArray(value)) return value.length;
+      if (value && typeof value === "object") {
+        if (typeof value.count === "number") return value.count;
+        if (Array.isArray(value.items)) return value.items.length;
+      }
+      return Number(value) || 0;
+    };
+
+    values.researchers = toCount(res);
+    values.projects = toCount(proj);
+    values.events = toCount(ev);
 
     const counterElements = Array.from(document.querySelectorAll("[data-counter]"));
-    const numericValues = [values.researchers, values.projects, values.publications, values.events];
+    const numericValues = [values.researchers, values.projects, values.events];
 
     counterElements.forEach((element, index) => {
       const targetValue = Number(numericValues[index] || 0);

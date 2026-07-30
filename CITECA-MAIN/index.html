@@ -59,10 +59,34 @@
           <h2 class="section-title reveal" data-i18n="sections.stats.title"></h2>
         </div>
         <ul class="grid-stats reveal-stagger">
-          <li class="card stat"><div class="ico"><i data-icon="users" data-size="20"></i></div><div class="num" data-counter data-to="40" data-suffix="+">0</div><p class="lbl" data-i18n="stats.researchers"></p></li>
-          <li class="card stat"><div class="ico"><i data-icon="rocket" data-size="20"></i></div><div class="num" data-counter data-to="25" data-suffix="">0</div><p class="lbl" data-i18n="stats.projects"></p></li>
-          <li class="card stat"><div class="ico"><i data-icon="book" data-size="20"></i></div><div class="num" data-counter data-to="180" data-suffix="+">0</div><p class="lbl" data-i18n="stats.publications"></p></li>
-          <li class="card stat"><div class="ico"><i data-icon="flask" data-size="20"></i></div><div class="num" data-counter data-to="60" data-suffix="">0</div><p class="lbl" data-i18n="stats.events"></p></li>
+          <li class="card stat">
+            <div class="ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 3H8a2 2 0 0 0-2 2v14l5-2 5 2V5a2 2 0 0 0-2-2Z"></path>
+              </svg>
+            </div>
+            <div class="num" data-counter data-to="40">0</div>
+            <p class="lbl" data-i18n="stats.researchers"></p>
+          </li>
+          <li class="card stat">
+            <div class="ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 14h16"></path><path d="M7 14v4"></path><path d="M17 14v4"></path><path d="M8 10h8"></path><path d="M9 6h6"></path><path d="M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"></path>
+              </svg>
+            </div>
+            <div class="num" data-counter data-to="25" data-suffix="">0</div>
+            <p class="lbl" data-i18n="stats.projects"></p>
+          </li>
+          <li class="card stat">
+            <div class="ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                <path d="M16 2v4"></path><path d="M8 2v4"></path><path d="M3 10h18"></path>
+              </svg>
+            </div>
+            <div class="num" data-counter data-to="60" data-suffix="">0</div>
+            <p class="lbl" data-i18n="stats.events"></p>
+          </li>
         </ul>
       </div>
     </section>
@@ -96,42 +120,6 @@
       </div>
     </section>
 
-    <!-- PUBLICATIONS -->
-    <section class="pad bg-alt">
-      <div class="container">
-        <div class="section-head">
-          <div class="reveal"><span class="eyebrow" data-i18n="sections.publications.eyebrow"></span></div>
-          <h2 class="section-title reveal" data-i18n="sections.publications.title"></h2>
-          <p class="section-sub reveal" data-i18n="sections.publications.subtitle"></p>
-        </div>
-        <div class="pub-tools reveal">
-          <label class="pub-search">
-            <i data-icon="search" data-size="16"></i>
-            <input id="pub-search-input" type="search" data-i18n-attr="placeholder:sections.publications.search">
-          </label>
-        </div>
-        <div class="pub-cats reveal">
-          <button class="cat-btn active" data-cat="All" data-i18n="sections.publications.all">All</button>
-          <button class="cat-btn" data-cat="Information Technologies">Information Technologies</button>
-          <button class="cat-btn" data-cat="Computer Science">Computer Science</button>
-          <button class="cat-btn" data-cat="Software Engineering">Software Engineering</button>
-          <button class="cat-btn" data-cat="Networks and Communications">Networks and Communications</button>
-          <button class="cat-btn" data-cat="Artificial Intelligence">Artificial Intelligence</button>
-          <button class="cat-btn" data-cat="Data Science">Data Science</button>
-          <button class="cat-btn" data-cat="Digital Transformation">Digital Transformation</button>
-        </div>
-        <div class="timeline">
-          <ul class="pub-list reveal-stagger" id="pub-list">
-            <li class="pub" data-cat="Artificial Intelligence" data-title="Contrastive pretraining for scientific literature retrieval"><span class="dot"></span><a href="#" class="pub-card"><div class="pub-meta"><div><span class="year">2025</span><span class="cat">Artificial Intelligence</span></div><div><h3>Contrastive pretraining for scientific literature retrieval</h3><small>ACL 2025</small></div></div><span class="pub-read"><span data-i18n="sections.publications.read"></span> <i data-icon="arrow-ur" data-size="16"></i></span></a></li>
-            <li class="pub" data-cat="Networks and Communications" data-title="Federated sensing at the urban edge: a Porto case study"><span class="dot"></span><a href="#" class="pub-card"><div class="pub-meta"><div><span class="year">2025</span><span class="cat">Networks and Communications</span></div><div><h3>Federated sensing at the urban edge: a Porto case study</h3><small>IEEE Network</small></div></div><span class="pub-read"><span data-i18n="sections.publications.read"></span> <i data-icon="arrow-ur" data-size="16"></i></span></a></li>
-            <li class="pub" data-cat="Data Science" data-title="Research publication example"><span class="dot"></span><a href="#" class="pub-card"><div class="pub-meta"><div><span class="year">2024</span><span class="cat">Data Science</span></div><div><h3>Research publication example</h3><small> Research</small></div></div><span class="pub-read"><span data-i18n="sections.publications.read"></span> <i data-icon="arrow-ur" data-size="16"></i></span></a></liCITECA>
-            <li class="pub" data-cat="Software Engineering" data-title="Secure software lifecycle patterns for research platforms"><span class="dot"></span><a href="#" class="pub-card"><div class="pub-meta"><div><span class="year">2024</span><span class="cat">Software Engineering</span></div><div><h3>Secure software lifecycle patterns for research platforms</h3><small>Journal of Systems and Software</small></div></div><span class="pub-read"><span data-i18n="sections.publications.read"></span> <i data-icon="arrow-ur" data-size="16"></i></span></a></li>
-            <li class="pub" data-cat="Digital Transformation" data-title="Multimodal reasoning in low-resource languages"><span class="dot"></span><a href="#" class="pub-card"><div class="pub-meta"><div><span class="year">2023</span><span class="cat">Digital Transformation</span></div><div><h3>Multimodal reasoning in low-resource languages</h3><small>EMNLP 2023</small></div></div><span class="pub-read"><span data-i18n="sections.publications.read"></span> <i data-icon="arrow-ur" data-size="16"></i></span></a></li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
     <!-- RESEARCHERS -->
     <section class="pad bg-white">
       <div class="container">
@@ -145,25 +133,6 @@
           <li class="card person"><div class="avatar h2">MC</div><h3>Sample Researcher</h3><p class="role">Networks & Communications Lead</p><ul class="tags"><li class="chip">Networks</li><li class="chip">Edge</li></ul><div class="socials"><a href="#" class="social" aria-label="LinkedIn"><i data-icon="linkedin" data-size="14"></i></a><a href="#" class="social" aria-label="Twitter"><i data-icon="twitter" data-size="14"></i></a><a href="#" class="social" aria-label="GitHub"><i data-icon="github" data-size="14"></i></a></div></li>
           <li class="card person"><div class="avatar h3">JA</div><h3>Sample Researcher</h3><p class="role">Research Scientist</p><ul class="tags"><li class="chip">R</li><li class="chip">Optimization</li></ul><div class="socials"><a href="#" class="social" aria-label="LinkedIn"><i data-icon="linkedin" data-size="14"></i></a><a href="#" class="social" aria-label="Twitter"><i data-icon="twitter" data-size="14"></i></a><a href="#" class="social" aria-label="GitHub"><i data-icon="github" data-size="14"></i></a></div></li>
           <li class="card person"><div class="avatar h4">SF</div><h3>Sample Researcher</h3><p class="role">Digital Transformation</p><ul class="tags"><li class="chip">Innovation</li><li class="chip">Technology Transfer</li></ul><div class="socials"><a href="#" class="social" aria-label="LinkedIn"><i data-icon="linkedin" data-size="14"></i></a><a href="#" class="social" aria-label="Twitter"><i data-icon="twitter" data-size="14"></i></a><a href="#" class="social" aria-label="GitHub"><i data-icon="github" data-size="14"></i></a></div></li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- RESOURCES -->
-    <section class="pad bg-alt">
-      <div class="container">
-        <div class="section-head">
-          <div class="reveal"><span class="eyebrow" data-i18n="sections.resources.eyebrow"></span></div>
-          <h2 class="section-title reveal" data-i18n="sections.resources.title"></h2>
-          <p class="section-sub reveal" data-i18n="sections.resources.subtitle"></p>
-        </div>
-        <ul class="grid-res reveal-stagger">
-          <li><a href="#" class="res"><div class="ico"><i data-icon="file" data-size="20"></i></div><div class="body"><h3>CITECA Annual Report 2024</h3><small>PDF · 4.2 MB</small></div><span class="dl" aria-label="Download"><i data-icon="download" data-size="16"></i></span></a></li>
-          <li><a href="#" class="res"><div class="ico"><i data-icon="database" data-size="20"></i></div><div class="body"><h3>Porto Urban Sensor Dataset</h3><small>CSV · 128 MB</small></div><span class="dl" aria-label="Download"><i data-icon="download" data-size="16"></i></span></a></li>
-          <li><a href="#" class="res"><div class="ico"><i data-icon="code" data-size="20"></i></div><div class="body"><h3>Research Repository</h3><small>GitHub · Open access</small></div><span class="dl" aria-label="Download"><i data-icon="download" data-size="16"></i></span></a></li>
-          <li><a href="#" class="res"><div class="ico"><i data-icon="bookmark" data-size="20"></i></div><div class="body"><h3>PQC Reference Implementation</h3><small>Repository</small></div><span class="dl" aria-label="Download"><i data-icon="download" data-size="16"></i></span></a></li>
-          <li><a href="#" class="res"><div class="ico"><i data-icon="file" data-size="20"></i></div><div class="body"><h3>Strategic Plan 2024–2027</h3><small>PDF · 1.8 MB</small></div><span class="dl" aria-label="Download"><i data-icon="download" data-size="16"></i></span></a></li>
-          <li><a href="#" class="res"><div class="ico"><i data-icon="database" data-size="20"></i></div><div class="body"><h3>Multilingual Scientific Corpus</h3><small>Parquet · 2.4 GB</small></div><span class="dl" aria-label="Download"><i data-icon="download" data-size="16"></i></span></a></li>
         </ul>
       </div>
     </section>

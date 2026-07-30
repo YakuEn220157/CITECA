@@ -5,7 +5,6 @@
     { id: "about", href: "about.html", labelKey: "nav.about" },
     { id: "research", href: "research.html", labelKey: "nav.research" },
     { id: "projects", href: "projects.html", labelKey: "nav.projects" },
-    { id: "internationalization", href: "internationalization.html", labelKey: "nav.internationalization" },
     { id: "events", href: "events.html", labelKey: "nav.events" },
     { id: "contact", href: "contact.html", labelKey: "nav.contact" },
   ];
@@ -76,7 +75,6 @@
           <li><a href="about.html" data-i18n="nav.about">About</a></li>
           <li><a href="research.html" data-i18n="nav.research">Research</a></li>
           <li><a href="projects.html" data-i18n="nav.projects">Projects</a></li>
-          <li><a href="internationalization.html" data-i18n="nav.internationalization">Internationalization</a></li>
           <li><a href="events.html" data-i18n="nav.events">Events</a></li>
           <li><a href="contact.html" data-i18n="nav.contact">Contact</a></li>
         </ul>
