@@ -12,6 +12,27 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/:id", async (req, res) => {
+  try {
+    const rows = await db.query("SELECT * FROM projects WHERE id = ?", [req.params.id]);
+    if (!rows || rows.length === 0) {
+      return res.status(404).json({ ok: false, message: "Project not found." });
+    }
+
+    const project = rows[0];
+    const researchers = await db.query(
+      `SELECT r.* FROM researchers r
+       JOIN project_researchers pr ON pr.researcher_id = r.id
+       WHERE pr.project_id = ?`,
+      [req.params.id]
+    );
+
+    res.json({ ok: true, project, researchers });
+  } catch (error) {
+    res.status(500).json({ ok: false, message: error.message });
+  }
+});
+
 router.post("/", verifyToken, async (req, res) => {
   try {
     const d = req.body;
