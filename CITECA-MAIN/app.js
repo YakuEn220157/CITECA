@@ -174,7 +174,6 @@
       });
     });
     
-    // Safely apply the active classes to the toggle buttons
     document.querySelectorAll(".lang-toggle").forEach((button) => {
       button.setAttribute("aria-label", translationSet.switchTo);
       button.setAttribute("title", translationSet.switchTo);
@@ -207,7 +206,7 @@
   async function populateResearchers() {
     const target = document.querySelector(".grid-people");
     if (!target) return;
-    target.style.alignItems = "flex-start";
+    target.style.alignItems = "flex-start"; // Fixed grid stretching
     const researchers = await requestJson("/researchers", []);
     target.innerHTML = researchers.map((p, index) => {
       const name = p.name || p.full_name || "Researcher";
@@ -247,7 +246,7 @@
   async function populateProjects() {
     const target = document.querySelector(".grid-projects");
     if (!target) return;
-    target.style.alignItems = "flex-start";
+    target.style.alignItems = "flex-start"; // Fixed grid stretching
     const projects = await requestJson("/projects", []);
     target.innerHTML = projects.map((p, idx) => {
       const inlineBanner = p.image_url ? `style="background-image:url('${p.image_url}'); background-size:cover; background-position:center;"` : '';
@@ -338,7 +337,7 @@
   }
 
   // ==========================================
-  // CORE ICONS
+  // CORE ICONS & UI SETUP
   // ==========================================
   const ICONS = {
     search: '<svg width="{s}" height="{s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
@@ -365,11 +364,6 @@
     document.querySelectorAll("[data-icon]").forEach((el) => { el.innerHTML = window.__icon(el.dataset.icon, el.dataset.size || 20); });
   }
 
-  // ==========================================
-  // UI & NAVIGATION ANIMATIONS
-  // ==========================================
-  
-  // ---> THIS IS THE MISSING TRANSLATION TOGGLE EVENT <---
   function setupLanguageToggle() {
     document.querySelectorAll(".lang-toggle").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -531,15 +525,15 @@
   document.addEventListener("DOMContentLoaded", () => {
     applyI18n();
     renderIcons();
-    
-    setupLanguageToggle(); // <--- FIXED! The EN/PT button now works again!
-    
+    setupLanguageToggle(); 
     setupMobileNavigation();
     setupScrollProgress();
     const revealObserver = setupRevealAnimations();
     setupCounterAnimations();
     createHeroParticles();
-    setupResearchPage(revealObserver);
+    
+    // Static render for Research lines (before DB sync)
+    if(typeof window.renderResearch === "function") window.renderResearch(window.__t());
     setupHomeResearch(revealObserver);
 
     populateDashboardStatsDynamic();
