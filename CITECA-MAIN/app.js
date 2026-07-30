@@ -202,6 +202,29 @@
     try { const response = await fetch(`${API_BASE}${endpoint}`); return response.ok ? await response.json() : fallback; } catch { return fallback; }
   }
 
+  function buildInitialsText(value, fallback = 'AI') {
+    const words = (value || '').trim().split(/\s+/).filter(Boolean);
+    if (!words.length) return fallback.toUpperCase();
+    if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+    return `${words[0][0]}${words[words.length - 1][0]}`.toUpperCase();
+  }
+
+  function buildInitialsDataUrl(value, accentColor = '#0B3C6D') {
+    const initials = buildInitialsText(value, 'AI').slice(0, 2);
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320"><rect width="100%" height="100%" rx="32" fill="${accentColor}"/><circle cx="160" cy="160" r="112" fill="rgba(255,255,255,0.14)"/><text x="50%" y="54%" text-anchor="middle" dominant-baseline="middle" font-family="Inter, Arial, sans-serif" font-size="118" font-weight="700" fill="#ffffff">${initials}</text></svg>`;
+    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+  }
+
+  function buildFallbackArtwork(type, value) {
+    const fallbackText = value || (type === 'researcher' ? 'Researcher' : type === 'event' ? 'Event' : 'Project');
+    const accentColor = type === 'researcher' ? '#0B3C6D' : type === 'event' ? '#1CA9C9' : '#3b82f6';
+    return buildInitialsDataUrl(fallbackText, accentColor);
+  }
+
+  function getArtwork(item, type) {
+    return item.image_url || buildFallbackArtwork(type, item.title || item.name || item.full_name || item.category || item.summary || 'CITECA');
+  }
+
   // 1. EXTENDED RESEARCHERS GRID
   async function populateResearchers() {
     const target = document.querySelector(".grid-people");
@@ -210,11 +233,12 @@
     const researchers = await requestJson("/researchers", []);
     target.innerHTML = researchers.map((p, index) => {
       const name = p.name || p.full_name || "Researcher";
-      const fallbackInitials = name.split(" ").map(n=>n[0]).join("").slice(0,2).toUpperCase();
+      const fallbackInitials = buildInitialsText(name, 'Researcher');
       const avatarClass = ["h1", "h2", "h3", "h4"][index % 4];
+      const artwork = p.image_url || buildFallbackArtwork('researcher', name);
       return `
         <li class="card person" style="display: flex; flex-direction: column; padding: 20px;">
-          ${p.image_url ? `<img src="${p.image_url}" alt="${name}" class="avatar" style="object-fit: cover;">` : `<div class="avatar ${avatarClass}">${fallbackInitials}</div>`}
+          ${p.image_url ? `<img src="${artwork}" alt="${name}" class="avatar" style="object-fit: cover;">` : `<div class="avatar ${avatarClass}">${fallbackInitials}</div>`}
           <h3 style="margin-top: 12px; font-size: 18px;">${name}</h3>
           <p class="role" style="font-size: 13px; margin-bottom: 12px;">${p.role || p.position || 'Academic Staff'}</p>
           <div style="margin-top: auto;">
@@ -249,7 +273,8 @@
     target.style.alignItems = "flex-start"; // Fixed grid stretching
     const projects = await requestJson("/projects", []);
     target.innerHTML = projects.map((p, idx) => {
-      const inlineBanner = p.image_url ? `style="background-image:url('${p.image_url}'); background-size:cover; background-position:center;"` : '';
+      const bannerImage = getArtwork(p, 'project');
+      const inlineBanner = `style="background-image:url('${bannerImage}'); background-size:cover; background-position:center; background-color:#e9f3fb;"`;
       return `
         <li class="card project">
           <a href="project.html?id=${p.id}" style="display: flex; flex-direction: column; text-decoration: none; color: inherit;">
@@ -279,54 +304,58 @@
     if (!target) return;
     const events = await requestJson("/events", []);
     const now = new Date();
-    now.setHours(0,0,0,0); 
+    now.setHours(0,0,0,0);
 
     const upcoming = [];
     const past = [];
 
-    events.forEach(e => {
+    events.forEach((e) => {
       const eDate = e.event_date ? new Date(e.event_date) : now;
-      if(eDate >= now) upcoming.push(e);
+      if (eDate >= now) upcoming.push(e);
       else past.push(e);
     });
 
     function renderBlock(arr, title) {
-      if(arr.length === 0) return `<p style="color:#666; font-size: 14px; font-style:italic; margin-bottom:40px;">No events listed.</p>`;
+      if (arr.length === 0) return `<p style="color:#666; font-size:14px; font-style:italic; margin-bottom:40px;">No events listed.</p>`;
       return `
         <h3 style="margin: 30px 0 16px 0; color: #0B3C6D; font-size: 22px; border-bottom: 2px solid #eee; padding-bottom: 8px;">${title}</h3>
         <ul class="grid-projects" style="margin-bottom: 40px; align-items: flex-start;">
-          ${arr.map((e, idx) => {
+          ${arr.map((e) => {
             const dateStr = e.event_date ? new Date(e.event_date).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : 'TBA';
-            const timeStr = e.start_time ? ` &bull; ${e.start_time.substring(0,5)}` : '';
-            const inlineBanner = e.image_url ? `style="background-image:url('${e.image_url}'); background-size:cover; background-position:center;"` : '';
+            const timeStr = e.start_time ? ` • ${e.start_time.substring(0,5)}` : '';
+            const researchers = Array.isArray(e.researchers) ? e.researchers : [];
+            const researcherTags = researchers.slice(0, 3).map((r) => `<span class="event-chip">${r.full_name || r.name}</span>`).join('');
+            const overflowTag = researchers.length > 3 ? `<span class="event-chip">+${researchers.length - 3} more</span>` : '';
+            const eventArtwork = getArtwork(e, 'event');
             return `
-              <li class="card project" style="cursor: pointer;">
-                <a href="event.html?id=${e.id}" style="display: flex; flex-direction: column; text-decoration: none; color: inherit;">
-                  <div style="display: flex; flex-direction: column;">
-                    <div class="cover p${(idx % 4) + 1}" ${inlineBanner}>
-                      <span class="tag" style="font-size: 11px;">${e.category || 'Event'}</span>
+              <li class="event-card" style="cursor: pointer;">
+                <a href="event.html?id=${e.id}" style="display:flex; flex-direction:column; text-decoration:none; color:inherit;">
+                  <div class="event-cover" style="background-image:url('${eventArtwork}'); background-size:cover; background-position:center; background-color:#eef8fb;">
+                    <span class="tag" style="font-size:11px;">${e.category || 'Event'}</span>
+                  </div>
+                  <div class="event-body">
+                    <div class="event-meta">
+                      <i data-icon="calendar" data-size="12"></i>
+                      <span>${dateStr}${timeStr}</span>
                     </div>
-                    <div class="body" style="padding: 16px; display: flex; flex-direction: column;">
-                      <div style="margin-bottom: 10px; font-size: 12px; font-weight: 600; color: #1CA9C9;">
-                        <i data-icon="calendar" data-size="12" style="vertical-align: middle; margin-right: 4px;"></i>
-                        ${dateStr}${timeStr}
+                    <h3 class="event-title">${e.title || 'Untitled Event'}</h3>
+                    ${e.description ? `<p class="event-copy">${e.description}</p>` : ''}
+                    ${(e.venue || e.speaker) ? `
+                      <div style="font-size:13px; color:#555; display:grid; gap:4px;">
+                        ${e.venue ? `<div>📍 <strong>Venue:</strong> ${e.venue}</div>` : ''}
+                        ${e.speaker ? `<div>🗣️ <strong>Speaker:</strong> ${e.speaker}</div>` : ''}
                       </div>
-                      <h3 style="margin-bottom: 6px; font-size: 18px;">${e.title || 'Untitled Event'}</h3>
-                      ${e.description ? `<p style="margin-bottom: 12px; font-size: 13px; line-height: 1.4;">${e.description}</p>` : ''}
-                      ${(e.venue || e.speaker) ? `
-                        <div style="font-size: 12px; color: #555; margin-bottom: 16px;">
-                          ${e.venue ? `<div style="margin-bottom: 4px;">📍 <strong>Venue:</strong> ${e.venue}</div>` : ''}
-                          ${e.speaker ? `<div>🗣️ <strong>Speaker:</strong> ${e.speaker}</div>` : ''}
-                        </div>
-                      ` : '<div style="margin-bottom: 16px;"></div>'}
-                      ${e.registration_link ? `
-                      <div style="margin-top: 8px; padding-top: 12px; border-top: 1px solid #eee;">
-                        <a href="${e.registration_link}" target="_blank" class="btn btn-solid" style="display: inline-flex; align-items: center; padding: 8px 16px; font-size: 12px;">
-                          Register <i data-icon="arrow" data-size="12" style="margin-left: 6px;"></i>
-                        </a>
+                    ` : ''}
+                    ${researchers.length ? `
+                      <div class="event-tags">
+                        ${researcherTags}${overflowTag}
                       </div>
-                      ` : ''}
-                    </div>
+                    ` : ''}
+                    ${e.registration_link ? `
+                      <div style="margin-top:6px; padding-top:12px; border-top: 1px solid #eef2f7;">
+                        <span class="btn btn-solid" style="display:inline-flex; align-items:center; padding:8px 16px; font-size:12px;">Register</span>
+                      </div>
+                    ` : ''}
                   </div>
                 </a>
               </li>`;
@@ -334,7 +363,7 @@
         </ul>`;
     }
 
-    target.innerHTML = renderBlock(upcoming, "Upcoming Events") + renderBlock(past, "Past Events");
+    target.innerHTML = renderBlock(upcoming, 'Upcoming Events') + renderBlock(past, 'Past Events');
     renderIcons();
   }
 
@@ -361,6 +390,7 @@
 
     const project = response.project;
     const researchers = response.researchers || [];
+    const projectArtwork = getArtwork(project, 'project');
     const projectDate = project.start_date || project.end_date ? `${project.start_date || 'Start TBD'} — ${project.end_date || 'End TBD'}` : '';
     const partnerList = project.partners ? project.partners.split(/[,;]+/).map((item) => item.trim()).filter(Boolean) : [];
 
@@ -375,6 +405,7 @@
       <section class="container" style="padding:40px 24px; max-width:1160px;">
         <div class="detail-grid">
           <article class="card" style="padding:32px;">
+            <img src="${projectArtwork}" alt="${project.title}" style="width:100%; border-radius:18px; object-fit:cover; max-height:320px; margin-bottom:24px;">
             <h2 style="margin-bottom:18px;">Project overview</h2>
             ${project.detailed_description ? `<p style="line-height:1.8; color:#444;">${project.detailed_description}</p>` : `<p style="line-height:1.8; color:#444;">${project.summary || 'No detailed description available.'}</p>`}
             <div style="display:grid;gap:14px;margin-top:24px;">
@@ -434,6 +465,8 @@
     }
 
     const event = response.event;
+    const researchers = Array.isArray(response.researchers) ? response.researchers : [];
+    const eventArtwork = getArtwork(event, 'event');
     const eventDate = event.event_date ? new Date(event.event_date).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : 'TBA';
     const timeInfo = event.start_time ? `${event.start_time}${event.end_time ? ` – ${event.end_time}` : ''}` : '';
 
@@ -445,18 +478,36 @@
           ${event.description ? `<p style="max-width:760px; margin-top:18px;">${event.description}</p>` : ''}
         </div>
       </section>
-      <section class="container" style="padding:40px 24px; max-width:960px;">
-        <div class="card detail-grid" style="padding:32px;">
-          <div>
-            <h2>Event details</h2>
-            <div style="display:grid;gap:16px;margin-top:24px;">
-              <div><strong>Date:</strong> ${eventDate}</div>
-              ${timeInfo ? `<div><strong>Time:</strong> ${timeInfo}</div>` : ''}
-              ${event.venue ? `<div><strong>Venue:</strong> ${event.venue}</div>` : ''}
-              ${event.speaker ? `<div><strong>Speaker:</strong> ${event.speaker}</div>` : ''}
-              ${event.registration_link ? `<div><strong>Registration:</strong> <a href="${event.registration_link}" target="_blank">${event.registration_link}</a></div>` : ''}
-              ${event.image_url ? `<div><img src="${event.image_url}" alt="${event.title}" style="width:100%;border-radius:18px;object-fit:cover;max-height:420px;margin-top:10px;"></div>` : ''}
+      <section class="container" style="padding:40px 24px; max-width:1160px;">
+        <div class="event-detail-shell">
+          <div class="event-panel">
+            <h2>Event overview</h2>
+            <p style="margin-top:16px;">${event.description || 'More details about this activity will be shared soon.'}</p>
+            <div class="detail-list" style="margin-top:24px;">
+              <div><strong>Date</strong><span>${eventDate}</span></div>
+              ${timeInfo ? `<div><strong>Time</strong><span>${timeInfo}</span></div>` : ''}
+              ${event.venue ? `<div><strong>Venue</strong><span>${event.venue}</span></div>` : ''}
+              ${event.speaker ? `<div><strong>Speaker</strong><span>${event.speaker}</span></div>` : ''}
+              ${event.registration_link ? `<div><strong>Registration</strong><a href="${event.registration_link}" target="_blank" rel="noopener">${event.registration_link}</a></div>` : ''}
             </div>
+            <img src="${eventArtwork}" alt="${event.title}" style="width:100%; border-radius:18px; object-fit:cover; max-height:420px; margin-top:24px;">
+          </div>
+
+          <div class="event-panel">
+            <h2>Researchers involved</h2>
+            ${researchers.length ? `
+              <ul class="grid-people" style="margin-top:24px;">
+                ${researchers.map((r, index) => `
+                  <li class="person" style="padding:24px; align-items:flex-start; text-align:left;">
+                    ${r.image_url ? `<img src="${r.image_url}" alt="${r.full_name || r.name}" class="avatar">` : `<div class="avatar h${(index % 4) + 1}">${(r.full_name || r.name || 'Researcher').split(' ').map((part) => part[0]).join('').slice(0,2).toUpperCase()}</div>`}
+                    <h3 style="margin-top:18px;">${r.full_name || r.name}</h3>
+                    <p style="margin-top:8px; color:#666; font-size:14px;">${r.position || r.role || ''}</p>
+                    ${r.expertise ? `<p style="margin-top:10px; color:#555; font-size:14px; line-height:1.5;">${r.expertise}</p>` : ''}
+                    ${r.email ? `<a href="mailto:${r.email}" style="margin-top:10px; display:inline-flex; color:var(--primary); font-size:14px; font-weight:600;">${r.email}</a>` : ''}
+                  </li>
+                `).join('')}
+              </ul>
+            ` : `<p style="margin-top:16px; color:#666; font-size:15px;">No researchers are linked to this event yet.</p>`}
           </div>
         </div>
       </section>`;
@@ -579,52 +630,59 @@
     }
   }
 
-  function setupResearchPage(revealObserver) {
+  async function loadResearchAreas(revealObserver) {
+    const areas = await requestJson("/areas", []);
     const researchLinesContainer = document.getElementById("research-lines");
-    if (!researchLinesContainer) return;
-    window.renderResearch = (translationSet) => {
-      const icons = ["brain", "network", "cpu", "shield"];
-      researchLinesContainer.innerHTML = translationSet.research.lines.map((line, index) => `
-        <li class="simple-area reveal">
-          <div class="row">
-            <div class="ico">${window.__icon(icons[index % icons.length], 28)}</div>
-            <div>
-              <h2>${line.title}</h2>
-              <p>${line.description}</p>
-              <p class="tlabel">${translationSet.research.topicsLabel}</p>
-              <ul class="tchips">${line.topics.map((topic) => `<li>${topic}</li>`).join("")}</ul>
-            </div>
-          </div>
-        </li>`).join("");
-      researchLinesContainer.querySelectorAll(".reveal").forEach((element) => revealObserver.observe(element));
-    };
-    window.renderResearch(window.__t());
-  }
-
-  function setupHomeResearch(revealObserver) {
     const homeResearchContainer = document.getElementById("home-research");
-    if (!homeResearchContainer) return;
-    const rebuildHomeResearch = (translationSet) => {
+    const items = Array.isArray(areas) ? areas : [];
+
+    const renderAreas = (container, compact = false) => {
+      if (!container) return;
+      if (!items.length) {
+        container.innerHTML = '<li class="card area reveal"><p style="margin:0; color:#666;">No research areas available yet.</p></li>';
+        return;
+      }
+
       const icons = ["brain", "network", "cpu", "shield"];
-      homeResearchContainer.innerHTML = translationSet.research.lines.map((line, index) => `
-        <li class="card area reveal">
-          <div class="area-inner">
-            <div class="ico">${window.__icon(icons[index % icons.length], 24)}</div>
-            <div>
-              <h3>${line.title}</h3>
-              <p>${line.description}</p>
-              <ul class="chips">${line.topics.map((topic) => `<li class="chip">${topic}</li>`).join("")}</ul>
+      container.innerHTML = items.map((area, index) => {
+        const tags = Array.isArray(area.tags) ? area.tags : [];
+        const tagMarkup = tags.length
+          ? `<ul class="chips">${tags.map((tag) => `<li class="chip">${tag.name}</li>`).join("")}</ul>`
+          : '<p style="margin:8px 0 0; font-size:13px; color:#666;">No tags yet.</p>';
+
+        if (compact) {
+          return `
+            <li class="simple-area reveal">
+              <div class="row">
+                <div class="ico">${window.__icon(icons[index % icons.length], 28)}</div>
+                <div>
+                  <h2>${area.title || "Research Area"}</h2>
+                  <p>${area.description || ""}</p>
+                  <p class="tlabel">Research Topics</p>
+                  ${tagMarkup}
+                </div>
+              </div>
+            </li>`;
+        }
+
+        return `
+          <li class="card area reveal">
+            <div class="area-inner">
+              <div class="ico">${window.__icon(icons[index % icons.length], 24)}</div>
+              <div>
+                <h3>${area.title || "Research Area"}</h3>
+                <p>${area.description || ""}</p>
+                ${tagMarkup}
+              </div>
             </div>
-          </div>
-        </li>`).join("");
-      homeResearchContainer.querySelectorAll(".reveal").forEach((element) => revealObserver.observe(element));
+          </li>`;
+      }).join("");
+
+      container.querySelectorAll(".reveal").forEach((element) => revealObserver.observe(element));
     };
-    rebuildHomeResearch(window.__t());
-    const originalSetLanguage = window.__setLang;
-    window.__setLang = (languageCode) => {
-      originalSetLanguage(languageCode);
-      rebuildHomeResearch(window.__t());
-    };
+
+    if (researchLinesContainer) renderAreas(researchLinesContainer, true);
+    if (homeResearchContainer) renderAreas(homeResearchContainer, false);
   }
 
   async function populateDashboardStatsDynamic() {
@@ -660,9 +718,7 @@
     setupCounterAnimations();
     createHeroParticles();
     
-    // Static render for Research lines (before DB sync)
-    if(typeof window.renderResearch === "function") window.renderResearch(window.__t());
-    setupHomeResearch(revealObserver);
+    loadResearchAreas(revealObserver).catch(() => {});
 
     populateDashboardStatsDynamic();
     populateResearchers();

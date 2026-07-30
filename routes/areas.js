@@ -37,7 +37,14 @@ router.put("/:id", verifyToken, async (req, res) => {
 // ADD TOPIC (TAG) TO AREA
 router.post("/tags", verifyToken, async (req, res) => {
   try {
-    const result = await db.query("INSERT INTO research_tags (area_id, name) VALUES (?, ?)", [req.body.area_id, req.body.name]);
+    const areaId = Number(req.body.area_id);
+    const name = String(req.body.name || "").trim();
+
+    if (!areaId || !name) {
+      return res.status(400).json({ ok: false, message: "A valid area and tag name are required." });
+    }
+
+    const result = await db.query("INSERT INTO research_tags (area_id, name) VALUES (?, ?)", [areaId, name]);
     res.status(201).json({ ok: true, id: Number(result.insertId) });
   } catch (error) { res.status(500).json({ ok: false, message: error.message }); }
 });
@@ -45,6 +52,7 @@ router.post("/tags", verifyToken, async (req, res) => {
 // DELETE AREA OR TAG
 router.delete("/:id", verifyToken, async (req, res) => {
   try {
+    await db.query("DELETE FROM research_tags WHERE area_id = ?", [req.params.id]);
     await db.query("DELETE FROM research_areas WHERE id = ?", [req.params.id]);
     res.json({ ok: true });
   } catch (error) { res.status(500).json({ ok: false, message: error.message }); }

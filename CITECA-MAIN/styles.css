@@ -153,6 +153,23 @@ section.pad{padding:96px 0}
 .grid-projects{margin-top:64px;display:grid;gap:24px;grid-template-columns:1fr}
 @media(min-width:640px){.grid-projects{grid-template-columns:repeat(2,1fr)}}
 .project{overflow:hidden;transition:transform .5s var(--ease),box-shadow .5s var(--ease)}
+.event-card{overflow:hidden;border-radius:24px;border:1px solid var(--border);background:#fff;box-shadow:var(--shadow-card);transition:transform .4s var(--ease),box-shadow .4s var(--ease)}
+.event-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-hover)}
+.event-card .event-cover{position:relative;aspect-ratio:16/10;overflow:hidden;background:linear-gradient(135deg,var(--primary-deep),var(--accent));padding:20px;display:flex;align-items:flex-end}
+.event-card .event-cover::after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,rgba(255,255,255,.18),transparent 50%,rgba(0,0,0,.18));pointer-events:none}
+.event-card .event-body{padding:24px;display:flex;flex-direction:column;gap:14px}
+.event-card .event-meta{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.14em;color:var(--accent)}
+.event-card .event-title{font-size:20px;font-weight:600;letter-spacing:-.01em;color:var(--primary-deep)}
+.event-card .event-copy{font-size:15px;line-height:1.65;color:var(--muted)}
+.event-card .event-tags{display:flex;flex-wrap:wrap;gap:8px}
+.event-card .event-chip{display:inline-flex;align-items:center;border-radius:9999px;background:#F5F8FC;padding:6px 10px;font-size:12px;font-weight:600;color:var(--primary)}
+.event-detail-shell{display:grid;gap:24px}
+.event-detail-shell .event-panel{padding:32px;border-radius:24px;border:1px solid var(--border);background:#fff;box-shadow:var(--shadow-card)}
+.event-detail-shell .event-panel h2{font-size:24px;font-weight:600;letter-spacing:-.01em;color:var(--primary-deep)}
+.event-detail-shell .event-panel p,.event-detail-shell .event-panel li{font-size:15px;line-height:1.7;color:var(--muted)}
+.event-detail-shell .event-panel .detail-list{display:grid;gap:14px;margin-top:20px}
+.event-detail-shell .event-panel .detail-list div{display:flex;flex-direction:column;gap:4px}
+.event-detail-shell .event-panel .detail-list strong{font-size:13px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
 .project:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover)}
 .project .cover{position:relative;aspect-ratio:16/10;overflow:hidden;
   background-image:radial-gradient(circle at 1.2px 1.2px,rgba(255,255,255,.35) 1.2px,transparent 0);background-size:18px 18px;background-color:var(--primary)}

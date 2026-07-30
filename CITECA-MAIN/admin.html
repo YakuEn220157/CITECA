@@ -60,6 +60,7 @@
     <div class="tabs">
       <button class="tab-btn active" onclick="switchTab(event, 'pane-events')">Manage Events</button>
       <button class="tab-btn" onclick="switchTab(event, 'pane-researchers')">Manage Researchers</button>
+      <button class="tab-btn" onclick="switchTab(event, 'pane-research-lines')">Manage Research Lines</button>
       <button class="tab-btn" onclick="switchTab(event, 'pane-projects')">Manage Projects</button>
     </div>
 
@@ -75,8 +76,10 @@
           <div class="form-group"><label>Venue / Hall</label><input type="text" id="ev-venue"></div>
           <div class="form-group"><label>Keynote Speaker</label><input type="text" id="ev-speaker"></div>
           <div class="form-group"><label>Registration URL</label><input type="url" id="ev-reg"></div>
-          <div class="form-group"><label>Image/Banner URL</label><input type="text" id="ev-img" placeholder="https://..."></div>
+          <div class="form-group"><label>Image/Banner URL or Upload</label><input type="text" id="ev-img" placeholder="https://..."></div>
+          <div class="form-group"><label>Upload Image File</label><input type="file" id="ev-img-file" accept="image/*"></div>
           <div class="form-group full-width"><label>Detailed Description</label><textarea id="ev-desc" rows="3"></textarea></div>
+          <div class="form-group full-width"><label>Associated Researchers</label><div id="event-researcher-list" style="display:flex; flex-wrap:wrap; gap:10px;"></div></div>
         </div>
         <div>
           <button type="submit" id="btn-submit-events" class="btn">Save New Event</button>
@@ -99,7 +102,8 @@
           <div class="form-group"><label>Ciência ID</label><input type="text" id="res-ciencia"></div>
           <div class="form-group"><label>Google Scholar URL</label><input type="url" id="res-scholar"></div>
           <div class="form-group"><label>LinkedIn URL</label><input type="url" id="res-linkedin"></div>
-          <div class="form-group"><label>Profile Photo URL</label><input type="text" id="res-img"></div>
+          <div class="form-group"><label>Profile Photo URL or Upload</label><input type="text" id="res-img" placeholder="https://..."></div>
+          <div class="form-group"><label>Upload Profile Photo</label><input type="file" id="res-img-file" accept="image/*"></div>
           <div class="form-group full-width"><label>Primary Area of Expertise</label><input type="text" id="res-areas" placeholder="AI, Deep Learning"></div>
           <div class="form-group full-width"><label>Academic Biography</label><textarea id="res-bio" rows="3"></textarea></div>
         </div>
@@ -109,6 +113,26 @@
         </div>
       </form>
       <div style="margin-top:40px;"><h3>Existing Faculty</h3><div id="render-researchers"></div></div>
+    </div>
+
+    <div id="pane-research-lines" class="tab-content">
+      <form id="form-research-lines">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Research Line Title</label>
+            <input type="text" id="research-line-title" placeholder="e.g. Artificial Intelligence">
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <input type="text" id="research-line-description" placeholder="Short description for the research line">
+          </div>
+        </div>
+        <div>
+          <button type="submit" class="btn" id="btn-submit-research-lines">Add Research Line</button>
+          <button type="button" class="btn btn-secondary" id="btn-cancel-research-lines" style="display:none;" onclick="cancelResearchLineEdit()">Cancel Edit</button>
+        </div>
+      </form>
+      <div style="margin-top:40px;"><h3>Existing Research Lines</h3><div id="render-research-lines"></div></div>
     </div>
 
     <div id="pane-projects" class="tab-content">
@@ -121,9 +145,11 @@
           <div class="form-group"><label>Start Date</label><input type="date" id="proj-start"></div>
           <div class="form-group"><label>End Date</label><input type="date" id="proj-end"></div>
           <div class="form-group"><label>Principal Investigator (PI)</label><input type="text" id="proj-pi"></div>
-          <div class="form-group"><label>Banner Image URL</label><input type="text" id="proj-img"></div>
+          <div class="form-group"><label>Banner Image URL or Upload</label><input type="text" id="proj-img" placeholder="https://..."></div>
+          <div class="form-group"><label>Upload Banner Image</label><input type="file" id="proj-img-file" accept="image/*"></div>
           <div class="form-group full-width"><label>Consortium Partners</label><input type="text" id="proj-partners" placeholder="Partner Alpha, Partner Beta"></div>
           <div class="form-group full-width"><label>Executive Summary</label><textarea id="proj-summary" rows="3"></textarea></div>
+          <div class="form-group full-width"><label>Associated Researchers</label><div id="project-researcher-list" style="display:flex; flex-wrap:wrap; gap:10px;"></div></div>
         </div>
         <div>
           <button type="submit" id="btn-submit-projects" class="btn">Save New Project</button>
@@ -139,7 +165,8 @@
     let sessionToken = localStorage.getItem('citeca_auth_token');
 
     // GLOBAL MEMORY STATE
-    let DB = { events: [], researchers: [], projects: [] };
+    let DB = { events: [], researchers: [], projects: [], researchAreas: [] };
+    let editingResearchLineId = null;
     let editMode = { events: null, researchers: null, projects: null };
 
     function notify(msg, type='success') {
@@ -150,6 +177,48 @@
     function formatDateForInput(dateString) {
       if (!dateString) return '';
       try { return new Date(dateString).toISOString().split('T')[0]; } catch { return ''; }
+    }
+
+    function buildInitialsText(value, fallback = 'AI') {
+      const words = (value || '').trim().split(/\s+/).filter(Boolean);
+      if (!words.length) return fallback.toUpperCase();
+      if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+      return `${words[0][0]}${words[words.length - 1][0]}`.toUpperCase();
+    }
+
+    function buildInitialsDataUrl(value, accentColor = '#0B3C6D') {
+      const initials = buildInitialsText(value, 'AI').slice(0, 2);
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320">
+        <rect width="100%" height="100%" rx="32" fill="${accentColor}"/>
+        <circle cx="160" cy="160" r="112" fill="rgba(255,255,255,0.14)"/>
+        <text x="50%" y="54%" text-anchor="middle" dominant-baseline="middle" font-family="Inter, Arial, sans-serif" font-size="118" font-weight="700" fill="#ffffff">${initials}</text>
+      </svg>`;
+      return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+    }
+
+    function buildFallbackImageValue(type, value) {
+      const fallbackText = value || (type === 'researcher' ? 'Researcher' : type === 'event' ? 'Event' : 'Project');
+      const accentColor = type === 'researcher' ? '#0B3C6D' : type === 'event' ? '#1CA9C9' : '#3b82f6';
+      return buildInitialsDataUrl(fallbackText, accentColor);
+    }
+
+    function readImageFile(fileInput) {
+      return new Promise((resolve) => {
+        if (!fileInput || !fileInput.files || !fileInput.files[0]) return resolve(null);
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => resolve(null);
+        reader.readAsDataURL(fileInput.files[0]);
+      });
+    }
+
+    async function resolveImageValue(type, textValue, urlValue, fileInputId) {
+      const fileInput = document.getElementById(fileInputId);
+      const uploadedImage = await readImageFile(fileInput);
+      if (uploadedImage) return uploadedImage;
+      const trimmedUrl = (urlValue || '').trim();
+      if (trimmedUrl) return trimmedUrl;
+      return buildFallbackImageValue(type, textValue);
     }
 
     function checkAuthenticationState() {
@@ -195,7 +264,50 @@
       return fetch(url, { method, headers, body: payload ? JSON.stringify(payload) : null });
     }
 
+    function renderResearcherCheckboxes() {
+      const eventContainer = document.getElementById('event-researcher-list');
+      const projectContainer = document.getElementById('project-researcher-list');
+      if (!eventContainer || !projectContainer) return;
+
+      const researchers = (DB.researchers || []).map(r => ({
+        id: r.id,
+        name: r.name || r.full_name || 'Researcher'
+      }));
+
+      const buildMarkup = (nameAttr) => researchers.length
+        ? researchers.map(r => `
+            <label style="display:flex; align-items:center; gap:6px; padding:8px 10px; border:1px solid #e2e8f0; border-radius:999px; background:#f8fbfd; font-size:13px;">
+              <input type="checkbox" name="${nameAttr}" value="${r.id}">
+              <span>${r.name}</span>
+            </label>`).join('')
+        : '<span style="font-size:13px; color:#777;">No researchers available yet.</span>';
+
+      eventContainer.innerHTML = buildMarkup('event-researcher-checkbox');
+      projectContainer.innerHTML = buildMarkup('project-researcher-checkbox');
+    }
+
+    function getSelectedResearcherIds(containerId) {
+      const container = document.getElementById(containerId);
+      if (!container) return [];
+      return Array.from(container.querySelectorAll('input[type="checkbox"]:checked')).map(input => Number(input.value)).filter(Boolean);
+    }
+
+    function syncResearcherCheckboxes(containerId, selectedIds = []) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      const selectedSet = new Set(selectedIds.map(Number));
+      container.querySelectorAll('input[type="checkbox"]').forEach(input => {
+        input.checked = selectedSet.has(Number(input.value));
+      });
+    }
+
     async function fetchAllRecords() {
+      const resResearchers = await securedRequest(`${API_URL}/researchers`);
+      if(resResearchers.ok) {
+        DB.researchers = await resResearchers.json();
+        renderResearcherCheckboxes();
+      }
+
       // Fetch Events
       const resEv = await securedRequest(`${API_URL}/events`);
       if(resEv.ok) {
@@ -224,6 +336,13 @@
           </div>`).join('');
       }
 
+      // Fetch Research Areas & Tags
+      const resAreas = await securedRequest(`${API_URL}/areas`);
+      if(resAreas.ok) {
+        DB.researchAreas = await resAreas.json();
+        renderResearchAreaManagement();
+      }
+
       // Fetch Projects
       const resProj = await securedRequest(`${API_URL}/projects`);
       if(resProj.ok) {
@@ -236,6 +355,99 @@
               <button class="btn btn-danger" onclick="executeRemoval('projects', ${d.id})">Delete</button>
             </div>
           </div>`).join('');
+      }
+    }
+
+    function renderResearchAreaManagement() {
+      const container = document.getElementById('render-research-lines');
+      if (!container) return;
+
+      container.innerHTML = DB.researchAreas.map(area => `
+        <div class="item-card" style="display:flex; flex-direction:column; gap:12px; align-items:stretch;">
+          <div style="display:flex; justify-content:space-between; gap:12px; align-items:flex-start; flex-wrap:wrap;">
+            <div>
+              <strong>${area.title || 'Untitled Research Line'}</strong>
+              ${area.description ? `<div style="color:#666; font-size:13px; margin-top:4px;">${area.description}</div>` : ''}
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button class="btn btn-warning" type="button" onclick="startEditResearchLine(${area.id})">Edit</button>
+              <button class="btn btn-danger" type="button" onclick="deleteResearchLine(${area.id})">Delete</button>
+            </div>
+          </div>
+          <div style="border-top:1px solid #e2e8f0; padding-top:10px;">
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
+              ${Array.isArray(area.tags) && area.tags.length
+                ? area.tags.map(tag => `<span style="display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:#eef6fb; color:#0B3C6D; font-size:13px;">${tag.name}<button type="button" onclick="deleteResearchTag(${tag.id})" style="border:none; background:transparent; cursor:pointer; color:#e74c3c; font-weight:700;">×</button></span>`).join('')
+                : '<span style="font-size:13px; color:#777;">No tags yet</span>'}
+            </div>
+            <form onsubmit="event.preventDefault(); addResearchTag(${area.id});" style="display:flex; gap:8px; flex-wrap:wrap;">
+              <input id="tag-input-${area.id}" type="text" placeholder="Add a tag" style="padding:8px 10px; border:1px solid #ccc; border-radius:6px; min-width:220px;">
+              <button class="btn" type="submit">Add Tag</button>
+            </form>
+          </div>
+        </div>`).join('');
+    }
+
+    function resetResearchLineForm() {
+      document.getElementById('form-research-lines').reset();
+      document.getElementById('btn-submit-research-lines').textContent = 'Add Research Line';
+      document.getElementById('btn-cancel-research-lines').style.display = 'none';
+      editingResearchLineId = null;
+    }
+
+    function cancelResearchLineEdit() {
+      resetResearchLineForm();
+    }
+
+    function startEditResearchLine(id) {
+      const line = DB.researchAreas.find(item => item.id === id);
+      if (!line) return;
+
+      editingResearchLineId = id;
+      document.getElementById('research-line-title').value = line.title || '';
+      document.getElementById('research-line-description').value = line.description || '';
+      document.getElementById('btn-submit-research-lines').textContent = 'Update Research Line';
+      document.getElementById('btn-cancel-research-lines').style.display = 'inline-block';
+      window.scrollTo(0, 0);
+    }
+
+    async function addResearchTag(areaId) {
+      const input = document.getElementById(`tag-input-${areaId}`);
+      const name = input ? input.value.trim() : '';
+      if (!name) {
+        notify('Enter a tag name first.', 'error');
+        return;
+      }
+
+      const res = await securedRequest(`${API_URL}/areas/tags`, 'POST', { area_id: Number(areaId), name });
+      if (res.ok) {
+        notify('Tag added.');
+        fetchAllRecords();
+      } else {
+        const data = await res.json().catch(() => ({}));
+        notify(data.message || 'Unable to add tag.', 'error');
+      }
+    }
+
+    async function deleteResearchTag(tagId) {
+      if (!confirm('Delete this tag?')) return;
+      const res = await securedRequest(`${API_URL}/areas/tags/${tagId}`, 'DELETE');
+      if (res.ok) {
+        notify('Tag deleted.');
+        fetchAllRecords();
+      } else {
+        notify('Failed to delete tag.', 'error');
+      }
+    }
+
+    async function deleteResearchLine(id) {
+      if (!confirm('Delete this research line?')) return;
+      const res = await securedRequest(`${API_URL}/areas/${id}`, 'DELETE');
+      if (res.ok) {
+        notify('Research line deleted.');
+        fetchAllRecords();
+      } else {
+        notify('Failed to delete research line.', 'error');
       }
     }
 
@@ -263,6 +475,7 @@
         document.getElementById('ev-reg').value = item.registration_link || '';
         document.getElementById('ev-img').value = item.image_url || '';
         document.getElementById('ev-desc').value = item.description || '';
+        syncResearcherCheckboxes('event-researcher-list', (item.researchers || []).map(r => r.id));
         document.getElementById('btn-submit-events').textContent = 'Update Event';
         document.getElementById('btn-cancel-events').style.display = 'inline-block';
       } 
@@ -292,6 +505,7 @@
         document.getElementById('proj-img').value = item.image_url || '';
         document.getElementById('proj-partners').value = item.partners || '';
         document.getElementById('proj-summary').value = item.summary || '';
+        syncResearcherCheckboxes('project-researcher-list', (item.researchers || []).map(r => r.id));
         document.getElementById('btn-submit-projects').textContent = 'Update Project';
         document.getElementById('btn-cancel-projects').style.display = 'inline-block';
       }
@@ -301,19 +515,50 @@
     function cancelEdit(type) {
       editMode[type] = null;
       document.getElementById(`form-extended-${type === 'researchers' ? 'researcher' : type === 'projects' ? 'project' : 'event'}`).reset();
+      document.querySelectorAll('input[name="event-researcher-checkbox"], input[name="project-researcher-checkbox"]').forEach(input => input.checked = false);
+      ['ev-img-file', 'res-img-file', 'proj-img-file'].forEach((id) => {
+        const input = document.getElementById(id);
+        if (input) input.value = '';
+      });
       document.getElementById(`btn-submit-${type}`).textContent = type === 'events' ? 'Save New Event' : (type === 'projects' ? 'Save New Project' : 'Save New Profile');
       document.getElementById(`btn-cancel-${type}`).style.display = 'none';
     }
 
+    document.getElementById('form-research-lines').onsubmit = async (e) => {
+      e.preventDefault();
+      const title = document.getElementById('research-line-title').value.trim();
+      const description = document.getElementById('research-line-description').value.trim();
+
+      if (!title) {
+        notify('Enter a research line title.', 'error');
+        return;
+      }
+
+      const payload = { title, description };
+      const isUpdate = editingResearchLineId !== null;
+      const res = await securedRequest(isUpdate ? `${API_URL}/areas/${editingResearchLineId}` : `${API_URL}/areas`, isUpdate ? 'PUT' : 'POST', payload);
+
+      if (res.ok) {
+        notify(isUpdate ? 'Research line updated.' : 'Research line added.');
+        resetResearchLineForm();
+        fetchAllRecords();
+      } else {
+        const data = await res.json().catch(() => ({}));
+        notify(data.message || 'Unable to save research line.', 'error');
+      }
+    };
+
     document.getElementById('form-extended-event').onsubmit = async (e) => {
       e.preventDefault();
+      const imageUrl = await resolveImageValue('event', `${document.getElementById('ev-title').value} ${document.getElementById('ev-category').value}`.trim(), document.getElementById('ev-img').value, 'ev-img-file');
       const payload = {
         title: document.getElementById('ev-title').value, category: document.getElementById('ev-category').value,
         event_date: document.getElementById('ev-date').value || null, end_date: document.getElementById('ev-enddate').value || null,
         start_time: document.getElementById('ev-time').value || null, end_time: document.getElementById('ev-timeend').value || null,
         venue: document.getElementById('ev-venue').value, speaker: document.getElementById('ev-speaker').value,
-        registration_link: document.getElementById('ev-reg').value, image_url: document.getElementById('ev-img').value,
-        description: document.getElementById('ev-desc').value
+        registration_link: document.getElementById('ev-reg').value, image_url: imageUrl,
+        description: document.getElementById('ev-desc').value,
+        researcher_ids: getSelectedResearcherIds('event-researcher-list')
       };
       const isUp = editMode.events !== null;
       const res = await securedRequest(isUp ? `${API_URL}/events/${editMode.events}` : `${API_URL}/events`, isUp ? 'PUT' : 'POST', payload);
@@ -322,12 +567,13 @@
 
     document.getElementById('form-extended-researcher').onsubmit = async (e) => {
       e.preventDefault();
+      const imageUrl = await resolveImageValue('researcher', document.getElementById('res-name').value, document.getElementById('res-img').value, 'res-img-file');
       const payload = {
         name: document.getElementById('res-name').value, full_name: document.getElementById('res-name').value,
         role: document.getElementById('res-role').value, position: document.getElementById('res-role').value,
         email: document.getElementById('res-email').value, orcid_id: document.getElementById('res-orcid').value,
         ciencia_id: document.getElementById('res-ciencia').value, google_scholar: document.getElementById('res-scholar').value,
-        linkedin_url: document.getElementById('res-linkedin').value, image_url: document.getElementById('res-img').value,
+        linkedin_url: document.getElementById('res-linkedin').value, image_url: imageUrl,
         research_areas: document.getElementById('res-areas').value, expertise: document.getElementById('res-areas').value,
         status_membership: document.getElementById('res-status').value, bio: document.getElementById('res-bio').value
       };
@@ -338,12 +584,14 @@
 
     document.getElementById('form-extended-project').onsubmit = async (e) => {
       e.preventDefault();
+      const imageUrl = await resolveImageValue('project', `${document.getElementById('proj-title').value} ${document.getElementById('proj-category').value}`.trim(), document.getElementById('proj-img').value, 'proj-img-file');
       const payload = {
         title: document.getElementById('proj-title').value, category: document.getElementById('proj-category').value,
         funding_entity: document.getElementById('proj-funding').value, budget: document.getElementById('proj-budget').value || null,
         start_date: document.getElementById('proj-start').value || null, end_date: document.getElementById('proj-end').value || null,
-        principal_investigator: document.getElementById('proj-pi').value, image_url: document.getElementById('proj-img').value,
-        partners: document.getElementById('proj-partners').value, summary: document.getElementById('proj-summary').value
+        principal_investigator: document.getElementById('proj-pi').value, image_url: imageUrl,
+        partners: document.getElementById('proj-partners').value, summary: document.getElementById('proj-summary').value,
+        researcher_ids: getSelectedResearcherIds('project-researcher-list')
       };
       const isUp = editMode.projects !== null;
       const res = await securedRequest(isUp ? `${API_URL}/projects/${editMode.projects}` : `${API_URL}/projects`, isUp ? 'PUT' : 'POST', payload);
