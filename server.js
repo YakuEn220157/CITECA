@@ -1,7 +1,21 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const db = require('./db');
 const app = express();
+
+async function ensureLargeImageColumns() {
+  const tables = ['researchers', 'projects', 'events'];
+  for (const table of tables) {
+    try {
+      await db.query(`ALTER TABLE \`${table}\` MODIFY \`image_url\` TEXT`);
+    } catch (error) {
+      console.warn(`Image column check skipped for ${table}:`, error.message);
+    }
+  }
+}
+
+ensureLargeImageColumns();
 
 app.use(cors());
 app.use(express.json());

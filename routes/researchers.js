@@ -30,11 +30,17 @@ router.post("/", verifyToken, async (req, res) => {
     const safeName = d.name || d.full_name || "";
     const safeRole = d.role || d.position || "";
     const safeAreas = d.research_areas || d.expertise || "";
+    const safeOrcid = d.orcid_id || "";
+    const safeCiencia = d.ciencia_id || "";
+    const safeScholar = d.google_scholar || "";
+    const safeLinkedin = d.linkedin_url || "";
+    const safeBio = d.bio || "";
+    const safeStatus = d.status_membership || "Integrated Member";
     const image_url = resolveImageValue("researcher", d.image_url, safeName || safeRole || "Researcher");
-    console.log("RESEARCHER POST", { safeName, safeRole, safeAreas, image_url });
+
     const result = await db.query(
-      `INSERT INTO researchers (full_name, position, expertise, email, image_url) VALUES (?, ?, ?, ?, ?)`,
-      [safeName, safeRole, safeAreas, d.email || "", image_url]
+      `INSERT INTO researchers (full_name, position, expertise, email, orcid_id, ciencia_id, google_scholar, linkedin_url, bio, status_membership, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [safeName, safeRole, safeAreas, d.email || "", safeOrcid, safeCiencia, safeScholar, safeLinkedin, safeBio, safeStatus, image_url]
     );
     res.status(201).json({ ok: true, id: Number(result.insertId) });
   } catch (error) { res.status(500).json({ ok: false, message: error.message }); }
@@ -46,10 +52,17 @@ router.put("/:id", verifyToken, async (req, res) => {
     const safeName = d.name || d.full_name || "";
     const safeRole = d.role || d.position || "";
     const safeAreas = d.research_areas || d.expertise || "";
+    const safeOrcid = d.orcid_id || "";
+    const safeCiencia = d.ciencia_id || "";
+    const safeScholar = d.google_scholar || "";
+    const safeLinkedin = d.linkedin_url || "";
+    const safeBio = d.bio || "";
+    const safeStatus = d.status_membership || "Integrated Member";
     const image_url = resolveImageValue("researcher", d.image_url, safeName || safeRole || "Researcher");
+
     await db.query(
-      `UPDATE researchers SET full_name=?, position=?, expertise=?, email=?, image_url=? WHERE id=?`,
-      [safeName, safeRole, safeAreas, d.email || "", image_url, req.params.id]
+      `UPDATE researchers SET full_name=?, position=?, expertise=?, email=?, orcid_id=?, ciencia_id=?, google_scholar=?, linkedin_url=?, bio=?, status_membership=?, image_url=? WHERE id=?`,
+      [safeName, safeRole, safeAreas, d.email || "", safeOrcid, safeCiencia, safeScholar, safeLinkedin, safeBio, safeStatus, image_url, req.params.id]
     );
     res.json({ ok: true });
   } catch (error) { res.status(500).json({ ok: false, message: error.message }); }
